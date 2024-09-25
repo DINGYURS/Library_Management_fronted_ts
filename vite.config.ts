@@ -40,7 +40,8 @@ export default defineConfig({
     open: false, //自动打开
     proxy: {
       '/api': {
-        target: 'http://120.55.62.76:9000', // 真实接口地址, 后端给的基地址
+        // target: 'http://120.55.62.76:9000', // 真实接口地址, 后端给的基地址
+        target: 'http://127.0.0.1:9000', // 真实接口地址, 后端给的基地址
         changeOrigin: true, // 允许跨域
         secure: false, //设置是否使用安全连接（https）
         rewrite: path => path.replace(/^\/api/, "")

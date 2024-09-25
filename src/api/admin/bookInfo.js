@@ -11,9 +11,6 @@ export const pageQueryBookInfo = (page, pageSize, queryForm) => {
       bookName: queryForm.bookName,
       author: queryForm.author,
       category: queryForm.category
-    },
-    headers: {
-      token: userStore.token
     }
   })
 }
@@ -21,31 +18,19 @@ export const pageQueryBookInfo = (page, pageSize, queryForm) => {
 // 新增书籍信息
 export const insertBookInfo = (addForm) => {
   const userStore = useUserStore()
-  return request.post('/api/admin/book', addForm, {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.post('/api/admin/book', addForm)
 }
 
 // 修改书籍信息
 export const editBookInfo = (editForm) => {
   const userStore = useUserStore()
-  return request.put(`/api/admin/book`, editForm, {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.put(`/api/admin/book`, editForm)
 }
 
 // 删除书籍信息
 export const deleteBookInfo = (ids) => {
   const userStore = useUserStore();
-  return request.delete(`/api/admin/book/${ids}`,{
-    headers: {
-      token: userStore.token,
-    },
-  });
+  return request.delete(`/api/admin/book/${ids}`);
 };
 
 

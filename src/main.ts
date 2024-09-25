@@ -4,10 +4,10 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import App from './App.vue'
 import router from './router/index.js'
-import './assets/main.scss'
+import './style/main.scss'
 import pinia from './stores/index.js'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import './assets/tailwind.css'
+import './style/tailwind.css'
 
 const app = createApp(App)
 

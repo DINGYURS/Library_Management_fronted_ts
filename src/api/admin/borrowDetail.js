@@ -11,9 +11,6 @@ export const pageQueryBorrowDetail = (page, pageSize, queryForm) => {
       name: queryForm.name,
       username: queryForm.username,
       bookName: queryForm.bookName
-    },
-    headers: {
-      token: userStore.token
     }
   })
 }
@@ -21,31 +18,19 @@ export const pageQueryBorrowDetail = (page, pageSize, queryForm) => {
 // 新增借阅记录
 export const insertBorrowDetail = (addForm) => {
   const userStore = useUserStore()
-  return request.post('/api/admin/borrowDetail', addForm, {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.post('/api/admin/borrowDetail', addForm,)
 }
 
 // 修改借阅记录
 export const editBorrowDetail = (editForm) => {
   const userStore = useUserStore()
-  return request.put(`/api/admin/borrowDetail`, editForm, {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.put(`/api/admin/borrowDetail`, editForm)
 }
 
 // 删除借阅记录
 export const deleteBorrowDetail = (ids) => {
   const userStore = useUserStore();
-  return request.delete(`/api/admin/borrowDetail/${ids}`,{
-    headers: {
-      token: userStore.token,
-    },
-  });
+  return request.delete(`/api/admin/borrowDetail/${ids}`);
 };
 
 

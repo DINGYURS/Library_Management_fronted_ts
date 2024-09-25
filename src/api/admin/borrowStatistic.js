@@ -9,9 +9,6 @@ export const pageQueryBorrowStatistic = (page, pageSize, queryForm) => {
       page,
       pageSize,
       bookName: queryForm.bookName
-    },
-    headers: {
-      token: userStore.token
     }
   })
 }

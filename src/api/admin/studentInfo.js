@@ -10,9 +10,6 @@ export const pageQueryStudentInfo = (page, pageSize, queryForm) => {
       pageSize,
       name: queryForm.name,
       username: queryForm.username
-    },
-    headers: {
-      token: userStore.token
     }
   })
 }
@@ -21,31 +18,19 @@ export const pageQueryStudentInfo = (page, pageSize, queryForm) => {
 export const insertStudentInfo = (addForm) => {
   const userStore = useUserStore()
   console.log('addForm', addForm)
-  return request.post('/api/admin/student', addForm, {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.post('/api/admin/student', addForm)
 }
 
 // 修改学生信息
 export const editStudentInfo = (editForm) => {
   const userStore = useUserStore()
-  return request.put(`/api/admin/student`, editForm, {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.put(`/api/admin/student`, editForm)
 }
 
 // 删除学生信息
 export const deleteStudentInfo = (userId) => {
   const userStore = useUserStore();
-  return request.delete(`/api/admin/student/${userId}`,{
-    headers: {
-      token: userStore.token,
-    },
-  });
+  return request.delete(`/api/admin/student/${userId}`);
 };
 
 

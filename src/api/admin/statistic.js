@@ -8,9 +8,6 @@ export const getClassBorrowVolume = (start, end) => {
     params: {
       start,
       end
-    },
-    headers: {
-      token: userStore.token
     }
   })
 }
@@ -18,20 +15,12 @@ export const getClassBorrowVolume = (start, end) => {
 // 查询阅读积分Top10
 export const getCreditScoreTop10 = () => {
   const userStore = useUserStore()
-  return request.get('/api/admin/statistic/top10', {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.get('/api/admin/statistic/top10')
 }
 
 // 查询每类图书的阅读量
 export const getReadVolumeOfEachType = () => {
   const userStore = useUserStore()
-  return request.get('/api/admin/statistic/bookCategory', {
-    headers: {
-      token: userStore.token
-    }
-  })
+  return request.get('/api/admin/statistic/bookCategory')
 }
 

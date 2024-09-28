@@ -28,13 +28,13 @@
       <div></div>
     </div>
     <!-- 可视化数据展示区域 -->
-    <div class="flex-grow flex flex-col space-y-4">
+    <div class="flex-grow flex flex-col space-y-4 w-full h-full">
       <!-- 中部班级借阅数量折线图 -->
-      <div ref="lineChart" class="flex bg-white rounded-lg items-center justify-center p-5" style="height: 50%;"></div>
+      <div ref="lineChart" class="flex bg-white rounded-lg items-center justify-center p-5 w-full h-full"></div>
       <!-- 底部柱状图区域 -->
-      <div class="flex-grow flex space-x-4">
-        <div ref="barChart" class="flex-1 p-5 bg-white rounded-lg flex items-center justify-center" style="height: 100%;"></div>
-        <div ref="hBarChart" class="flex-1 p-5 bg-white rounded-lg flex items-center justify-center"></div>
+      <div class="flex-grow flex space-x-4 w-full h-full">
+        <div ref="barChart" class="flex-1 p-5 bg-white rounded-lg flex items-center justify-center w-full h-full"></div>
+        <div ref="hBarChart" class="flex-1 p-5 bg-white rounded-lg flex items-center justify-center w-full h-full"></div>
       </div>
     </div>
   </div>

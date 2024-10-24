@@ -1,4 +1,4 @@
-import request from '@/utils/request.js'
+import request from '@/utils/request.ts'
 
 // 分页查询信息
 export const pageQueryBookInfo = (page, pageSize, queryForm) => {

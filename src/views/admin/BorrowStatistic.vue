@@ -62,7 +62,7 @@
 </template>
 <script setup>
 import {ref, reactive, computed, onMounted} from 'vue'
-import {pageQueryBorrowStatistic} from "@/api/admin/borrowStatistic.js";
+import {pageQueryBorrowStatistic} from "@/api/admin/borrowStatistic.ts";
 
 const size = ref('default')
 const background = ref(true)
@@ -101,8 +101,8 @@ async function handleCurrentChange() {
       pageSize.value,
       queryForm
     )
-    tableData.value = response.data.data.records
-    total.value = response.data.data.total
+    tableData.value = response.data.records
+    total.value = response.data.total
   } catch (error) {
     console.error('Failed to fetch Label data:', error)
   }

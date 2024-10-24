@@ -172,7 +172,7 @@
 <script setup>
 import {ref, reactive, computed, onMounted} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {deleteBookInfo, editBookInfo, insertBookInfo, pageQueryBookInfo} from "@/api/admin/bookInfo.js";
+import {deleteBookInfo, editBookInfo, insertBookInfo, pageQueryBookInfo} from "@/api/admin/bookInfo.ts";
 
 const size = ref('default')
 const background = ref(true)
@@ -316,8 +316,8 @@ async function handleCurrentChange() {
       pageSize.value,
       queryForm
     )
-    tableData.value = response.data.data.records
-    total.value = response.data.data.total
+    tableData.value = response.data.records
+    total.value = response.data.total
   } catch (error) {
     console.error('Failed to fetch Label data:', error)
   }

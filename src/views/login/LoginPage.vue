@@ -150,10 +150,10 @@
 
 <script setup>
 import {User, Lock, Tickets, Male} from '@element-plus/icons-vue'
-import {userRegisterService, userLoginService} from '@/api/user.js'
+import {userRegisterService, userLoginService} from '@/api/user.ts'
 import {ref, watch} from 'vue'
 import {ElMessage} from 'element-plus'
-import {useUserStore} from '@/stores/user.js'
+import {useUserStore} from '@/stores/user.ts'
 import {useRouter} from 'vue-router'
 
 const isRegister = ref(false)
@@ -251,22 +251,19 @@ const login = async () => {
     // 如果验证成功，执行登录服务
     const res = await userLoginService(loginData)
 
-    if (res.data.code === 1) {
-      // 假设后端返回的数据结构如下：
-      // res.data.data = { token: '...', role: 'admin' }
-      userStore.setToken(res.data.data.token)
-      userStore.setRole(res.data.data.role) // 存储角色信息
-      ElMessage.success('登录成功')
-      console.log('role:', res.data.data.role)
-      // 跳转到首页或根据角色跳转
-      if (res.data.data.role === 0) {
-        await router.push('/admin/display')
-      } else if (res.data.data.role === 1) {
-        await router.push('/student/bookBorrow')
-      }
-    } else {
-      ElMessage.error(res.data.msg)
-    }
+		// 假设后端返回的数据结构如下：
+		// res.data = { token: '...', role: 'admin' }
+		userStore.setToken(res.data.token)
+		userStore.setRole(res.data.role) // 存储角色信息
+		userStore.setUserId(res.data.userId) // 存储用户id
+
+		ElMessage.success('登录成功')
+		// 跳转到首页或根据角色跳转
+		if (res.data.role === 0) {
+			await router.push('/admin/display')
+		} else if (res.data.role === 1) {
+			await router.push('/student/bookBorrow')
+		}
   } catch (error) {
     console.error('Failed to login:', error)
     ElMessage.error('登录失败')

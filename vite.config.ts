@@ -1,4 +1,3 @@
-import { fileURLToPath, URL } from 'node:url'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
@@ -6,12 +5,15 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
+import VueSetupExtend from 'vite-plugin-vue-setup-extend'
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/', // import.meta.env.BASE_URL 配置路径
   plugins: [
     vue(),
+    VueSetupExtend(),
     AutoImport({
       imports: ['vue'],
       resolvers: [
@@ -50,7 +52,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      "@": path.resolve(__dirname, "src"),
     }
   }
 })

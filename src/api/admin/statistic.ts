@@ -1,4 +1,4 @@
-import request from '@/utils/request.js'
+import request from '@/utils/request.ts'
 
 // 查询书本阅读量
 export const getClassBorrowVolume = (start, end) => {

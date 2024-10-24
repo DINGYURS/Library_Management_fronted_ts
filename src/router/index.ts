@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import {useUserStore} from '@/stores/user.js'
+import {useUserStore} from '@/stores/user.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,11 +48,15 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '/student/bookBorrow' // 默认重定向到显示页面
+          redirect: '/student/chatRoom' // 默认重定向到显示页面
         },
         {
           path: 'bookBorrow',
           component: () => import('@/views/student/BookBorrow.vue')
+        },
+        {
+          path: 'chatRoom',
+          component: () => import('@/views/student/ChatRoom.vue')
         }
       ]
     },
@@ -72,8 +76,9 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const token = userStore.token
   const role = userStore.role // 获取存储的角色信息 (整数)
+  const userId = userStore.userId // 获取存储的用户id信息
 
-  console.log('Token:', token, 'Role:', role, 'Path:', to.path)
+  console.log('Token:', token, 'Role:', role, 'Path:', to.path, 'UserId:', userId)
 
   // TODO: 有没有一种方法可以通过登录学生账号拿到token，然后伪造role为0，从而直接绕过管理员登录，直接访问管理员才能看到的界面
   if (!token && to.path !== '/login') {
@@ -92,7 +97,7 @@ router.beforeEach((to, from, next) => {
       if (role === 0) {
         next('/admin/display')
       } else if (role === 1) {
-        next('/student/bookBorrow')
+        next('/student/chatRoom')
       } else {
         // 处理异常情况，比如角色为空或未定义
         next('/login')

@@ -1,9 +1,7 @@
-import request from '@/utils/request.js'
-import { useUserStore } from '@/stores/user.js'
+import request from '@/utils/request.ts'
 
 // 分页查询信息
 export const pageQueryBorrowDetailIndividual = (page, pageSize, queryForm) => {
-  const userStore = useUserStore()
   return request.get('/api/student/borrowDetail/page', {
     params: {
       page,
@@ -11,9 +9,6 @@ export const pageQueryBorrowDetailIndividual = (page, pageSize, queryForm) => {
       bookName: queryForm.bookName,
       author: queryForm.author,
       category: queryForm.category
-    },
-    headers: {
-      token: userStore.token
     }
   })
 }

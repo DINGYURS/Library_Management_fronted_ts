@@ -56,7 +56,7 @@
       </el-dropdown>
     </el-header>
     <el-container>
-      <el-main class="el-main">
+      <el-main class="el-main m-5">
         <routerView></routerView>
       </el-main>
     </el-container>
@@ -64,21 +64,13 @@
 </template>
 
 <script setup>
-import {onMounted, reactive, ref} from 'vue'
-import router from '@/router/index.js'
-import {
-  DataLine,
-  Notebook,
-  Document,
-  CollectionTag,
-  School,
-  Reading
-} from '@element-plus/icons-vue'
+import { reactive, ref} from 'vue'
+import router from '@/router/index.ts'
 import {ElMessage} from "element-plus";
-import {changePassword} from "@/api/user.js";
-import {useUserStore} from "@/stores/user.js";
+import {changePassword} from "@/api/user.ts";
+import { useUserStore } from "@/stores/user.ts";
 
-const userStore = useUserStore()
+const { setToken } = useUserStore()
 const changePasswordFormVisible = ref(false)
 const labelPosition = ref('left')
 
@@ -93,8 +85,8 @@ async function submitChangePasswordChangePassword() {
   try {
     await changePassword(changePasswordForm)
     changePasswordFormVisible.value = false
-    await ElMessage.success('修改成功，请重新登陆')
-    userStore.setToken('')
+    ElMessage.success('修改成功，请重新登陆')
+    setToken('')
     await router.push('/login')
   } catch (error) {
     console.error('Failed to insert Label data:', error)
@@ -118,7 +110,7 @@ const changePasswordButton = () => {
 }
 
 const logOut = () => {
-  userStore.setToken('')
+  setToken('')
   router.push('/login')
 }
 </script>
@@ -132,11 +124,5 @@ const logOut = () => {
 .el-main {
   padding: 0;
   background-color: rgb(240, 242, 245);
-}
-
-.el-aside {
-  width: 200px;
-  text-align: center;
-  background-color: #e0e5df;
 }
 </style>

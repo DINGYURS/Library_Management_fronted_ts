@@ -1,9 +1,9 @@
 <template>
-  <div class="rounded-lg p-5">
+  <div class="p-5 w-full">
     <!-- 顶部表单 -->
-    <div style="width: 100%">
+    <div>
       <el-form :inline="true" :model="queryForm" class="font-bold bg-white rounded-lg mb-4 flex justify-between items-center">
-        <div class="flex space-x-4">
+        <div class="space-x-4">
           <el-form-item class="query-Form-item" label="条件查询">
             <el-input
               v-model="queryForm.bookName"
@@ -37,15 +37,13 @@
           />
         </div>
         <!-- 右侧按钮组 -->
-        <div class="flex space-x-4 mr-4">
-          <el-form-item class="query-Form-item">
+        <div class="flex mr-4">
             <el-button type="primary" @click="handleCurrentChange">查询</el-button>
-          </el-form-item>
         </div>
       </el-form>
     </div>
     <!-- 表单数据展示 -->
-    <div style="width: 100%">
+    <div>
       <!--      借书表单-->
       <el-table
         :data="tableData"
@@ -140,9 +138,9 @@
 <script setup>
 import {ref, reactive, computed, onMounted} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {pageQueryBookInfo} from "@/api/admin/bookInfo.js";
-import {bookBorrow, bookReturn} from "@/api/student/borrowAndReturn.js";
-import {pageQueryBorrowDetailIndividual} from "@/api/student/borrowDetail.js";
+import {pageQueryBookInfo} from "@/api/admin/bookInfo.ts";
+import {bookBorrow, bookReturn} from "@/api/student/borrowAndReturn.ts";
+import {pageQueryBorrowDetailIndividual} from "@/api/student/borrowDetail.ts";
 
 const size = ref('default')
 const background = ref(true)
@@ -213,25 +211,16 @@ async function handleBookReturn(recordId) {
 async function handleCurrentChange() {
   try {
     // TODO:这个书本分页查询需要返回的结果跟admin下的接口一样，需要在后端写两个一模一样但是请求路径不一样的代码吗
-    if (switchValue.value) {
-      const response = await pageQueryBorrowDetailIndividual(
-        currentPage.value,
-        pageSize.value,
-        queryForm
-      )
-      tableData.value = response.data.data.records
-      total.value = response.data.data.total
-    } else {
-      const response = await pageQueryBookInfo(
-        currentPage.value,
-        pageSize.value,
-        queryForm
-      )
-      tableData.value = response.data.data.records
-      total.value = response.data.data.total
-    }
+    const response = switchValue.value
+      ? await pageQueryBorrowDetailIndividual(currentPage.value, pageSize.value, queryForm)
+      : await pageQueryBookInfo(currentPage.value, pageSize.value, queryForm)
+
+    tableData.value = response.data.records
+    total.value = response.data.total
+    ElMessage.success('查询成功')
   } catch (error) {
-    console.error('Failed to fetch Label data:', error)
+    console.error('Failed to fetch data:', error)
+    ElMessage.error('查询失败')
   }
 }
 

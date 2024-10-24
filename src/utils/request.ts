@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { useUserStore } from '@/stores/user.js'
+import { useUserStore } from "@/stores/user"
 import { ElMessage } from 'element-plus'
-import router from '@/router/index.js'
+import router from '../router/index.ts'
 
 const instance = axios.create({
   //  1. 基础地址，超时时间
@@ -28,7 +28,7 @@ instance.interceptors.response.use(
     //  3. 处理业务失败
     //  4. 摘取核心响应数据
     if (res.data.code === 1) {
-      return res
+      return res.data
     }
     // 处理业务失败
     if (res.data.msg === 'NOT_LOGIN_FALSE_TOKEN') {

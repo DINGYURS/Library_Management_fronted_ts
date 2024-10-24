@@ -112,7 +112,7 @@
 
 <script setup>
 import {onMounted, reactive, ref} from 'vue'
-import router from '@/router/index.js'
+import router from '@/router/index.ts'
 import {
   DataLine,
   Notebook,
@@ -122,10 +122,10 @@ import {
   Reading
 } from '@element-plus/icons-vue'
 import {ElMessage} from "element-plus";
-import {changePassword} from "@/api/user.js";
-import {useUserStore} from "@/stores/user.js";
+import {changePassword} from "@/api/user.ts";
+import {useUserStore} from "@/stores/user.ts";
 
-const userStore = useUserStore()
+const { setToken } = useUserStore()
 const selectedMenuIndex = ref('/admin/display')
 const changePasswordFormVisible = ref(false)
 const labelPosition = ref('left')
@@ -147,7 +147,7 @@ async function submitChangePasswordChangePassword() {
     await changePassword(changePasswordForm)
     changePasswordFormVisible.value = false
     ElMessage.success('修改成功，请重新登陆')
-    userStore.setToken('')
+    setToken('')
     await router.push('/login')
   } catch (error) {
     console.error('Failed to insert Label data:', error)
@@ -171,7 +171,7 @@ const changePasswordButton = () => {
 }
 
 const logOut = () => {
-  userStore.setToken('')
+  setToken('')
   router.push('/login')
 }
 

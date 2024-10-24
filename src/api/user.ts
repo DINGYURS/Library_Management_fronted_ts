@@ -1,4 +1,4 @@
-import request from '@/utils/request.js'
+import request from '@/utils/request.ts'
 
 // 用户注册
 export const userRegisterService = (registerData) => {

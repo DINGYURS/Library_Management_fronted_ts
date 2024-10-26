@@ -18,11 +18,15 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '/admin/display' // 默认重定向到显示页面
+          redirect: '/admin/bookDisplay' // 默认重定向到显示页面
         },
         {
-          path: 'display', // 自动继承父路径 /admin/
-          component: () => import('@/views/admin/DataDisplay.vue')
+          path: 'bookDisplay', // 自动继承父路径 /admin/
+          component: () => import('@/views/admin/BookDisplay.vue')
+        },
+        {
+          path: 'personDisplay',
+          component: () => import('@/views/admin/PersonDisplay.vue')
         },
         {
           path: 'book',
@@ -95,7 +99,7 @@ router.beforeEach((to, from, next) => {
     } else {
       // 如果角色不匹配，重定向到对应角色的默认页面
       if (role === 0) {
-        next('/admin/display')
+        next('/admin/bookDisplay')
       } else if (role === 1) {
         next('/student/chatRoom')
       } else {

@@ -260,7 +260,7 @@ const login = async () => {
 		ElMessage.success('登录成功')
 		// 跳转到首页或根据角色跳转
 		if (res.data.role === 0) {
-			await router.push('/admin/display')
+			await router.push('/admin/bookDisplay')
 		} else if (res.data.role === 1) {
 			await router.push('/student/bookBorrow')
 		}

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full min-h-screen p-5 bg-slate-100 flex flex-col">
+  <div class="w-full h-full p-5 bg-slate-100 flex flex-col">
     <!-- 顶部时间选择区域 -->
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center">
@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import {ref, onMounted, computed, nextTick} from 'vue';
 import dayjs from 'dayjs';
-import useCharts  from '@/Composables/useCharts'
+import useCharts  from '@/composables/useCharts'
 import {getClassBorrowVolume, getCreditScoreTop10, getReadVolumeOfEachType} from "@/api/admin/statistic.ts";
 
 const startDate = ref(dayjs().startOf('week').format('YYYY-MM-DD')); // 初始时间段开始日期

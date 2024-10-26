@@ -55,15 +55,15 @@
         </template>
       </el-dropdown>
     </el-header>
-    <el-container>
+    <el-container >
       <el-aside class="el-aside">
         <el-menu
           background-color="#e0e5df"
           class="bw-0"
-          default-active="/admin/display"
+          default-active="/admin/bookDisplay"
           @select="handleSelect"
         >
-          <el-menu-item index="/admin/display">
+          <el-menu-item index="/admin/bookDisplay">
             <el-icon>
               <DataLine/>
             </el-icon>
@@ -126,7 +126,7 @@ import {changePassword} from "@/api/user.ts";
 import {useUserStore} from "@/stores/user.ts";
 
 const { setToken } = useUserStore()
-const selectedMenuIndex = ref('/admin/display')
+const selectedMenuIndex = ref('/admin/bookDisplay')
 const changePasswordFormVisible = ref(false)
 const labelPosition = ref('left')
 

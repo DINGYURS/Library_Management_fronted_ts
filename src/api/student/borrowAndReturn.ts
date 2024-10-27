@@ -1,18 +1,18 @@
-import request from '@/utils/request.ts'
+import request from "@/utils/request.ts";
 
 // 借书
-export const bookBorrow = (copyId) => {
-  return request.get('/api/student/bookBorrow', {
+export const bookBorrow = (copyId: number) => {
+  return request.get("/api/student/bookBorrow", {
     params: {
-      copyId
-    }
-  })
-}
+      copyId,
+    },
+  });
+};
 // 还书
-export const bookReturn = (recordId) => {
-  return request.get('/api/student/bookReturn', {
+export const bookReturn = (recordId: number) => {
+  return request.get("/api/student/bookReturn", {
     params: {
-      recordId
-    }
-  })
-}
+      recordId,
+    },
+  });
+};

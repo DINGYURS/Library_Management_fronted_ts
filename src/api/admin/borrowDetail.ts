@@ -1,31 +1,34 @@
-import request from '@/utils/request.ts'
+import request from "@/utils/request.ts";
+import { BorrowDetail, QueryForm } from "@/types/borrowDetailTypes.ts";
 
-// 分页查询信息
-export const pageQueryBorrowDetail = (page, pageSize, queryForm) => {
-  return request.get('/api/admin/borrowDetail/page', {
+// 分页查询借阅信息
+export const pageQueryBorrowDetail = (
+  page: number,
+  pageSize: number,
+  queryForm: QueryForm,
+) => {
+  return request.get("/api/admin/borrowDetail/page", {
     params: {
       page,
       pageSize,
       name: queryForm.name,
       username: queryForm.username,
-      bookName: queryForm.bookName
-    }
-  })
-}
-
-// 新增借阅记录
-export const insertBorrowDetail = (addForm) => {
-  return request.post('/api/admin/borrowDetail', addForm,)
-}
-
-// 修改借阅记录
-export const editBorrowDetail = (editForm) => {
-  return request.put(`/api/admin/borrowDetail`, editForm)
-}
-
-// 删除借阅记录
-export const deleteBorrowDetail = (ids) => {
-  return request.delete(`/api/admin/borrowDetail/${ids}`);
+      bookName: queryForm.bookName,
+    },
+  });
 };
 
+// 新增借阅记录
+export const insertBorrowDetail = (addForm: BorrowDetail) => {
+  return request.post("/api/admin/borrowDetail", addForm);
+};
 
+// 修改借阅记录
+export const editBorrowDetail = (editForm: BorrowDetail) => {
+  return request.put(`/api/admin/borrowDetail`, editForm);
+};
+
+// 删除借阅记录
+export const deleteBorrowDetail = (ids: number[]) => {
+  return request.delete(`/api/admin/borrowDetail/${ids}`);
+};

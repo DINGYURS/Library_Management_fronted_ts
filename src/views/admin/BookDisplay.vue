@@ -1,18 +1,16 @@
 <template>
-  <div class="w-full h-full p-5 bg-slate-100 flex flex-col">
+  <div class="flex h-full w-full flex-col bg-slate-100 p-5">
     <!-- 可视化数据展示区域 -->
-    <div class="w-full h-full">
-      <!-- 中部班级借阅数量折线图 -->
-      <div ref="svgChart" class="bg-white rounded-lg p-5 w-full h-full"></div>
-    </div>
+    <!-- 中部班级借阅数量折线图 -->
+    <div ref="svgChart" class="h-full w-full rounded-lg bg-white p-5"></div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { onMounted, ref, onUnmounted } from 'vue';
-import * as echarts from 'echarts';
-import axios from 'axios'; // 引入 axios
-import svgPath from '@/assets/Untitled.svg';
+<script lang="ts" setup>
+import { onMounted, onUnmounted, ref } from "vue";
+import * as echarts from "echarts";
+import axios from "axios"; // 引入 axios
+import svgPath from "@/assets/Untitled.svg";
 
 const svgChart = ref<HTMLElement | null>(null); // 引用 DOM 元素
 
@@ -24,29 +22,31 @@ onMounted(() => {
 
   // 使用 axios 来加载本地的 SVG 文件
   axios
-    .get(svgPath, { responseType: 'text' }) // 加载本地 SVG 文件
+    .get(svgPath, { responseType: "text" }) // 加载本地 SVG 文件
     .then((response) => {
       const svg = response.data;
-      echarts.registerMap('flight-seats', { svg: svg });
+      echarts.registerMap("flight-seats", { svg: svg });
 
-      const takenSeatNames = ['1'];
+      const takenSeatNames = ["1"];
 
       option = {
         tooltip: {},
         geo: {
-          map: 'flight-seats',
+          map: "flight-seats",
           roam: true,
-          selectedMode: 'multiple',
+          selectedMode: "multiple",
+          left: "0%",
+          top: "0%",
           tooltip: {
             show: true,
           },
           itemStyle: {
-            color: '#fff',
+            color: "#fff",
           },
           emphasis: {
             itemStyle: {
               color: undefined,
-              borderColor: 'green',
+              borderColor: "green",
               borderWidth: 2,
             },
             label: {
@@ -55,11 +55,11 @@ onMounted(() => {
           },
           select: {
             itemStyle: {
-              color: 'green',
+              color: "green",
             },
             label: {
               show: false,
-              textBorderColor: '#fff',
+              textBorderColor: "#fff",
               textBorderWidth: 2,
             },
           },
@@ -74,17 +74,17 @@ onMounted(() => {
             name: takenSeatNames[i],
             silent: true,
             itemStyle: {
-              color: '#bf0e08',
+              color: "#bf0e08",
             },
             emphasis: {
               itemStyle: {
-                borderColor: '#aaa',
+                borderColor: "#aaa",
                 borderWidth: 1,
               },
             },
             select: {
               itemStyle: {
-                color: '#bf0e08',
+                color: "#bf0e08",
               },
             },
           });
@@ -95,7 +95,7 @@ onMounted(() => {
       myChart.setOption(option);
 
       // Get selected seats.
-      myChart.on('geoselectchanged', function (params: any) {
+      myChart.on("geoselectchanged", function (params: any) {
         const selectedNames: string[] = params.allSelected[0].name.slice();
 
         // Remove taken seats.
@@ -105,11 +105,11 @@ onMounted(() => {
           }
         }
 
-        console.log('selected', selectedNames);
+        console.log("selected", selectedNames);
       });
     })
     .catch((error) => {
-      console.error('Error loading the SVG:', error);
+      console.error("Error loading the SVG:", error);
     });
 
   // 确保在组件卸载时销毁图表实例
@@ -119,5 +119,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

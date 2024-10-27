@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
+<script lang="ts" setup>
+import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useUserStore } from "@/stores/user.ts";
 
 const userId = useUserStore().userId;
@@ -7,7 +7,7 @@ let socket: WebSocket | null = null;
 
 // 定义输入的消息和消息列表
 const messageInput = ref("");
-const messages = reactive<Array<{ sender: string; content: string }>>([]);
+const messages = reactive<Array<{ sender: number; content: string }>>([]);
 
 // WebSocket 相关功能
 const connectWebSocket = () => {
@@ -42,7 +42,11 @@ const connectWebSocket = () => {
 
 // 发送消息功能
 const sendMessage = () => {
-  if (socket && socket.readyState === WebSocket.OPEN && messageInput.value.trim()) {
+  if (
+    socket &&
+    socket.readyState === WebSocket.OPEN &&
+    messageInput.value.trim()
+  ) {
     const messageData = { sender: userId, content: messageInput.value };
     socket.send(JSON.stringify(messageData)); // 通过 WebSocket 发送消息
     messageInput.value = ""; // 发送后清空输入框
@@ -63,43 +67,57 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="w-full h-full bg-white flex flex-row rounded-lg">
-
+  <div class="flex h-full w-full flex-row rounded-lg bg-white">
     <!--		好友列表-->
-    <div class="p-5 h-full bg-blue-500 basis-1/5 rounded-l-lg">
+    <div class="h-full basis-1/5 rounded-l-lg bg-blue-500 p-5">
       <h2 class="text-2xl font-bold">好友列表</h2>
     </div>
 
     <!--		聊天区-->
-    <div class=" basis-4/5 grid grid-rows-12 h-full">
-
+    <div class="grid h-full basis-4/5 grid-rows-12">
       <!--      当前聊天对象-->
       <div class="row-start-1 row-end-2">
-        <h2 class="text-2xl font-bold py-5">当前聊天对象：{{ userId }}</h2>
+        <h2 class="py-5 text-2xl font-bold">当前聊天对象：{{ userId }}</h2>
       </div>
 
       <!-- 消息展示区 -->
-      <div class="flex flex-col space-y-3 row-start-2 row-end-11 bg-yellow-500 overflow-auto">
-        <div v-for="(msg, index) in messages" :key="index" class="flex items-center space-x-3">
-        <span :class="{ 'text-blue-600': msg.sender === userId, 'font-bold': msg.sender !== userId }">
-          {{ msg.sender === userId ? "我" : msg.sender }}：
-        </span>
+      <div
+        class="row-start-2 row-end-11 flex flex-col space-y-3 overflow-auto bg-yellow-500"
+      >
+        <div
+          v-for="(msg, index) in messages"
+          :key="index"
+          class="flex items-center space-x-3"
+        >
+          <span
+            :class="{
+              'text-blue-600': msg.sender === userId,
+              'font-bold': msg.sender !== userId,
+            }"
+          >
+            {{ msg.sender === userId ? "我" : msg.sender }}：
+          </span>
           <span>{{ msg.content }}</span>
         </div>
       </div>
 
       <!-- 消息输入区 -->
-      <div class="flex items-center space-x-3 row-start-11 row-end-13">
+      <div class="row-start-11 row-end-13 flex items-center space-x-3">
         <label for="message">消息：</label>
         <input
-          @keyup.enter="sendMessage"
-          v-model="messageInput"
-          type="text"
           id="message"
-          class="w-1/2 border border-gray-300 rounded-lg p-1"
+          v-model="messageInput"
+          class="w-1/2 rounded-lg border border-gray-300 p-1"
           placeholder="输入消息..."
+          type="text"
+          @keyup.enter="sendMessage"
         />
-        <button @click="sendMessage" class="bg-blue-500 text-white px-3 py-1 rounded-lg">发送</button>
+        <button
+          class="rounded-lg bg-blue-500 px-3 py-1 text-white"
+          @click="sendMessage"
+        >
+          发送
+        </button>
       </div>
     </div>
   </div>

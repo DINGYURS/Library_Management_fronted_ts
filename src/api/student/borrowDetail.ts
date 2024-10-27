@@ -1,16 +1,19 @@
-import request from '@/utils/request.ts'
+import request from "@/utils/request.ts";
+import { QueryForm } from "@/types/bookTypes.ts";
 
 // 分页查询信息
-export const pageQueryBorrowDetailIndividual = (page, pageSize, queryForm) => {
-  return request.get('/api/student/borrowDetail/page', {
+export const pageQueryBorrowDetailIndividual = (
+  page: number,
+  pageSize: number,
+  queryForm: QueryForm,
+) => {
+  return request.get("/api/student/borrowDetail/page", {
     params: {
       page,
       pageSize,
       bookName: queryForm.bookName,
       author: queryForm.author,
-      category: queryForm.category
-    }
-  })
-}
-
-
+      category: queryForm.category,
+    },
+  });
+};

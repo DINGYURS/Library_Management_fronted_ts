@@ -1,3 +1,189 @@
+<script lang="ts" setup>
+import { computed, onMounted, reactive, ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  deleteBookInfo,
+  editBookInfo,
+  insertBookInfo,
+  pageQueryBookInfo,
+} from "@/api/admin/bookInfo.ts";
+import { BookForm, QueryForm } from "@/types/bookTypes.ts";
+
+const size = ref<"small" | "default" | "large">("default");
+const background = ref(true);
+const disabled = ref(false);
+const hideOnSinglePage = ref(true);
+const labelPosition = ref<"left" | "right" | "top">("left");
+const insertFormVisible = ref(false);
+const editFormVisible = ref(false);
+const tableData = ref<BookForm[]>([]);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const ids = ref<number[]>([]);
+
+const addForm = reactive<BookForm>({
+  bookName: "",
+  author: "",
+  press: "",
+  category: "",
+  totalWords: "",
+  price: "",
+});
+
+const editForm = reactive<BookForm>({
+  copyId: null,
+  bookName: "",
+  author: "",
+  press: "",
+  category: "",
+  totalWords: "",
+  price: "",
+});
+
+const queryForm = reactive<QueryForm>({
+  bookName: "",
+  author: "",
+  category: "",
+});
+
+// 计算表格序号
+const adjustedIndex = computed(() => {
+  return (index: number) => {
+    return (currentPage.value - 1) * pageSize.value + index + 1;
+  };
+});
+
+// “新增”按钮
+const addButton = () => {
+  Object.keys(addForm).forEach((key) => {
+    (addForm as any)[key] = ""; // 使用类型断言绕过类型检查
+  });
+  insertFormVisible.value = true;
+};
+
+// “编辑”按钮
+const editButton = (row: BookForm) => {
+  editFormVisible.value = true;
+  handleEchoData(row);
+};
+
+// 处理选中的行数据
+const handleSelectionChange = (selectedRows: BookForm[]) => {
+  ids.value = selectedRows.map((row) => row.copyId!);
+  console.log("Selected IDs:", ids.value);
+};
+
+// “删除”按钮
+const deleteButton = (row: BookForm) => {
+  ElMessageBox.confirm("确定删除该标签信息吗？", "警告", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    ids.value.push(row.copyId!);
+    handleDeleteBookInfo();
+  });
+};
+
+// “批量删除”按钮
+const batchDelete = () => {
+  ElMessageBox.confirm("确定删除这些标签信息吗？", "警告", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    handleDeleteBookInfo();
+  });
+};
+
+// 新增书籍信息
+async function submitInsert() {
+  try {
+    await insertBookInfo(addForm);
+    await handleCurrentChange();
+    insertFormVisible.value = false;
+    ElMessage.success("添加成功");
+  } catch (error) {
+    console.error("Failed to insert book data:", error);
+  }
+}
+
+// 取消新增
+const cancelInsert = () => {
+  insertFormVisible.value = false;
+};
+
+// 取消编辑
+const cancelEdit = () => {
+  editFormVisible.value = false;
+};
+
+// 编辑书籍信息
+async function submitEdit() {
+  try {
+    await editBookInfo(editForm);
+    await handleCurrentChange();
+    editFormVisible.value = false;
+    ElMessage.success("编辑成功");
+  } catch (error) {
+    console.error("Failed to update book data:", error);
+  }
+}
+
+// 删除书籍信息
+async function handleDeleteBookInfo() {
+  try {
+    await deleteBookInfo(ids.value);
+    await handleCurrentChange();
+    ElMessage.success("删除成功");
+  } catch (error) {
+    console.error("Failed to delete book data:", error);
+  }
+}
+
+// 分页查询数据
+async function handleCurrentChange() {
+  try {
+    const response = await pageQueryBookInfo(
+      currentPage.value,
+      pageSize.value,
+      queryForm,
+    );
+    tableData.value = response.data.records;
+    total.value = response.data.total;
+  } catch (error) {
+    console.error("Failed to fetch book data:", error);
+  }
+}
+
+// 回显数据
+async function handleEchoData(row: BookForm) {
+  try {
+    Object.assign(editForm, {
+      copyId: row.copyId,
+      bookName: row.bookName,
+      author: row.author,
+      press: row.press,
+      category: row.category,
+      totalWords: row.totalWords,
+      price: row.price,
+    });
+  } catch (error) {
+    console.error("Failed to edit book data:", error);
+  }
+}
+
+// 页面加载时获取数据
+onMounted(async () => {
+  try {
+    await handleCurrentChange();
+  } catch (error) {
+    console.error("Failed to fetch book data when created:", error);
+  }
+});
+</script>
+
 <template>
   <!-- 新增数据对话框 -->
   <el-dialog v-model="insertFormVisible" title="新增数据" width="500px">
@@ -11,23 +197,26 @@
       style="max-width: 460px; font-weight: bold"
     >
       <el-form-item label="书名" prop="bookName">
-        <el-input
-          placeholder="请输入书名" v-model="addForm.bookName"/>
+        <el-input v-model="addForm.bookName" placeholder="请输入书名" />
       </el-form-item>
       <el-form-item label="作者" prop="author">
-        <el-input placeholder="请输入作者姓名" v-model="addForm.author"/>
+        <el-input v-model="addForm.author" placeholder="请输入作者姓名" />
       </el-form-item>
       <el-form-item label="出版社" prop="author">
-        <el-input placeholder="请输入出版社名称" v-model="addForm.press"/>
+        <el-input v-model="addForm.press" placeholder="请输入出版社名称" />
       </el-form-item>
       <el-form-item label="类别" prop="author">
-        <el-input placeholder="请输入书籍所属类别" v-model="addForm.category"/>
+        <el-input v-model="addForm.category" placeholder="请输入书籍所属类别" />
       </el-form-item>
       <el-form-item label="字数" prop="totalWords">
-        <el-input placeholder="请输入书籍总字数" v-model="addForm.totalWords"/>
+        <el-input v-model="addForm.totalWords" placeholder="请输入书籍总字数" />
       </el-form-item>
       <el-form-item label="价格" prop="author">
-        <el-input @keyup.enter="submitInsert" placeholder="请输入价格" v-model="addForm.price"/>
+        <el-input
+          v-model="addForm.price"
+          placeholder="请输入价格"
+          @keyup.enter="submitInsert"
+        />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -49,23 +238,32 @@
       style="max-width: 460px; font-weight: bold"
     >
       <el-form-item label="书名" prop="bookName">
-        <el-input
-          placeholder="请输入书名" v-model="editForm.bookName"/>
+        <el-input v-model="editForm.bookName" placeholder="请输入书名" />
       </el-form-item>
       <el-form-item label="作者" prop="author">
-        <el-input placeholder="请输入作者姓名" v-model="editForm.author"/>
+        <el-input v-model="editForm.author" placeholder="请输入作者姓名" />
       </el-form-item>
       <el-form-item label="出版社" prop="press">
-        <el-input placeholder="请输入出版社名称" v-model="editForm.press"/>
+        <el-input v-model="editForm.press" placeholder="请输入出版社名称" />
       </el-form-item>
       <el-form-item label="类别" prop="category">
-        <el-input placeholder="请输入书籍所属类别" v-model="editForm.category"/>
+        <el-input
+          v-model="editForm.category"
+          placeholder="请输入书籍所属类别"
+        />
       </el-form-item>
       <el-form-item label="字数" prop="totalWords">
-        <el-input placeholder="请输入书籍总字数" v-model="editForm.totalWords"/>
+        <el-input
+          v-model="editForm.totalWords"
+          placeholder="请输入书籍总字数"
+        />
       </el-form-item>
       <el-form-item label="价格/元" prop="price">
-        <el-input @keyup.enter="submitInsert" placeholder="请输入价格" v-model="editForm.price"/>
+        <el-input
+          v-model="editForm.price"
+          placeholder="请输入价格"
+          @keyup.enter="submitInsert"
+        />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -77,8 +275,12 @@
   </el-dialog>
   <div class="rounded-lg p-5">
     <!-- 顶部表单 -->
-    <div style="width: 100%">
-      <el-form :inline="true" :model="queryForm" class="font-bold bg-white rounded-lg mb-4 flex justify-between items-center">
+    <div class="w-full">
+      <el-form
+        :inline="true"
+        :model="queryForm"
+        class="mb-4 flex items-center justify-between rounded-lg bg-white font-bold"
+      >
         <div class="flex space-x-4">
           <el-form-item class="query-Form-item" label="条件查询">
             <el-input
@@ -107,9 +309,11 @@
         </div>
 
         <!-- 右侧按钮组 -->
-        <div class="flex space-x-4 mr-4">
+        <div class="mr-4 flex space-x-4">
           <el-form-item class="query-Form-item">
-            <el-button type="primary" @click="handleCurrentChange">查询</el-button>
+            <el-button type="primary" @click="handleCurrentChange"
+              >查询
+            </el-button>
           </el-form-item>
           <el-form-item class="query-Form-item">
             <el-button type="primary" @click="addButton">新增</el-button>
@@ -119,7 +323,6 @@
           </el-form-item>
         </div>
       </el-form>
-
     </div>
     <!-- 表单数据展示 -->
     <div style="width: 100%">
@@ -136,11 +339,11 @@
             {{ adjustedIndex($index) }}
           </template>
         </el-table-column>
-        <el-table-column align="center" label="书名" prop="bookName"/>
-        <el-table-column align="center" label="作者" prop="author"/>
-        <el-table-column align="center" label="出版社" prop="press"/>
-        <el-table-column align="center" label="分类" prop="category"/>
-        <el-table-column align="center" label="价格/元" prop="price"/>
+        <el-table-column align="center" label="书名" prop="bookName" />
+        <el-table-column align="center" label="作者" prop="author" />
+        <el-table-column align="center" label="出版社" prop="press" />
+        <el-table-column align="center" label="分类" prop="category" />
+        <el-table-column align="center" label="价格/元" prop="price" />
         <el-table-column align="center" label="状态" prop="sex">
           <template #default="{ row }">
             <el-tag v-if="row.status === 0" type="success">在馆</el-tag>
@@ -167,194 +370,13 @@
       @current-change="handleCurrentChange"
     />
   </div>
-
 </template>
-<script setup>
-import {ref, reactive, computed, onMounted} from 'vue'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import {deleteBookInfo, editBookInfo, insertBookInfo, pageQueryBookInfo} from "@/api/admin/bookInfo.ts";
-
-const size = ref('default')
-const background = ref(true)
-const disabled = ref(false)
-const hideOnSinglePage = ref(true)
-const labelPosition = ref('left')
-const insertFormVisible = ref(false)
-const editFormVisible = ref(false)
-const tableData = ref([])
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
-const ids = ref([])
-
-const addForm = reactive({
-  bookName: '',
-  author: '',
-  press: '',
-  category: '',
-  totalWords: '',
-  price: ''
-})
-
-const editForm = reactive({
-  copyId: '',
-  bookName: '',
-  author: '',
-  press: '',
-  category: '',
-  totalWords: '',
-  price: ''
-})
-
-const queryForm = reactive({
-  bookName: '',
-  author: '',
-  category: ''
-})
-
-// 计算表格序号
-const adjustedIndex = computed(() => {
-  return (index) => {
-    return (currentPage.value - 1) * pageSize.value + index + 1
-  }
-})
-
-// “新增”按钮
-const addButton = () => {
-  Object.keys(addForm).forEach(key => {
-    addForm[key] = '';
-  });
-  insertFormVisible.value = true
-}
-
-// “编辑”按钮
-const editButton = (row) => {
-  editFormVisible.value = true
-  handleEchoData(row)
-}
-
-const handleSelectionChange = (selectedRows) => {
-  // 使用 map 方法从每个选中的行中提取 id 属性
-  ids.value = selectedRows.map((row) => row.copyId)
-  console.log('Selected IDs:', ids.value)
-  // 这里 ids 将是一个包含所有选中行 id 的数组
-}
-
-// “删除”按钮
-const deleteButton = (row) => {
-  ElMessageBox.confirm('确定删除该标签信息吗？', '警告', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    ids.value.push(row.copyId)
-    handleDeleteBookInfo()
-  })
-}
-
-// “批量删除”按钮
-const batchDelete = () => {
-  ElMessageBox.confirm('确定删除这些标签信息吗？', '警告', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    handleDeleteBookInfo()
-  })
-}
-
-// 新增学生信息
-async function submitInsert() {
-  try {
-    await insertBookInfo(addForm)
-    await handleCurrentChange()
-    insertFormVisible.value = false
-    ElMessage.success('添加成功')
-  } catch (error) {
-    console.error('Failed to insert Label data:', error)
-  }
-}
-
-// 取消新增
-const cancelInsert = () => {
-  insertFormVisible.value = false
-}
-
-//取消编辑
-const cancelEdit = () => {
-  editFormVisible.value = false
-}
-
-// 编辑学生信息
-async function submitEdit() {
-  try {
-    await editBookInfo(editForm)
-    await handleCurrentChange()
-    editFormVisible.value = false
-    ElMessage.success('编辑成功')
-  } catch (error) {
-    console.error('Failed to update Label data:', error)
-  }
-}
-
-// 删除学生信息
-async function handleDeleteBookInfo() {
-  try {
-    await deleteBookInfo(ids.value)
-    await handleCurrentChange(currentPage.value)
-    ElMessage.success('删除成功')
-  } catch (error) {
-    console.error('Failed to delete Label data:', error)
-  }
-}
-
-// 分页查询数据
-async function handleCurrentChange() {
-  try {
-    const response = await pageQueryBookInfo(
-      currentPage.value,
-      pageSize.value,
-      queryForm
-    )
-    tableData.value = response.data.records
-    total.value = response.data.total
-  } catch (error) {
-    console.error('Failed to fetch Label data:', error)
-  }
-}
-
-// 回显数据
-async function handleEchoData(row) {
-  try {
-    Object.assign(editForm, {
-      copyId: row.copyId,
-      bookName: row.bookName,
-      author: row.author,
-      press: row.press,
-      category: row.category,
-      totalWords: row.totalWords,
-      price: row.price
-    });
-  } catch (error) {
-    console.error('Failed to edit Label data:', error)
-  }
-}
-
-// 页面加载时获取数据
-onMounted(async () => {
-  try {
-    await handleCurrentChange()
-  } catch (error) {
-    console.error('Failed to fetch Label data when created:', error)
-  }
-})
-</script>
 <style scoped>
 .query-Form-item {
-  @apply mx-1.5 my-2.5
+  @apply mx-1.5 my-2.5;
 }
 
 .el-table {
-  @apply bg-white rounded-lg
+  @apply rounded-lg bg-white;
 }
 </style>

@@ -9,3 +9,23 @@ export interface FormModel {
   isOpenAdmin?: boolean;
   className: string;
 }
+
+export interface userInfo {
+  name: string;
+  sex: number;
+  username: string;
+  avatar: string;
+  phone: string;
+  email: string;
+  role: number;
+  userId: number;
+}
+
+export interface userInfoForm{
+  name: string,
+  sex: number,
+  username: string,
+  avatar: string,
+  phone: string,
+  email: string,
+}

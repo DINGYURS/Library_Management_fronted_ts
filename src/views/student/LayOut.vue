@@ -1,15 +1,57 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import router from "@/router/index.ts";
+import {
+  ChatLineRound,
+  EditPen,
+  Reading,
+  School,
+  View,
+} from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { changePassword } from "@/api/user.ts";
+import { changePassword, changeUserInfo } from "@/api/user.ts";
 import { useUserStore } from "@/stores/user.ts";
 
-const { setToken } = useUserStore();
+const { setToken, token, userInfo } = useUserStore();
+
+const selectedMenuIndex = ref<string>("/admin/bookDisplay");
 
 const changePasswordFormVisible = ref<boolean>(false);
+const userInfoDialogVisible = ref<boolean>(false); // 个人信息弹窗的显隐控制
 
+// 表单标签位置
 const labelPosition = ref<"left" | "right" | "top">("left");
+
+// 头像上传配置
+const avatarUploadConfig = {
+  action: "/api/common/upload", // 假设头像上传接口
+  showFileList: false,
+  headers:{'token': token},
+  onSuccess(response: any) {
+    userInfoForm.value.avatar = response.data;
+    ElMessage.success("头像更新成功");
+  },
+  onError() {
+    ElMessage.error("头像更新失败");
+  }
+};
+
+// 用户个人信息表单模型
+const userInfoForm = ref<{
+  name: string,
+  sex: number,
+  username: string,
+  avatar: string,
+  phone: string,
+  email: string,
+}>({
+  name: '',
+  sex: 0,
+  username: '',
+  avatar: '',
+  phone: '',
+  email: '',
+});
 
 // 修改密码表单模型
 const changePasswordForm = reactive<{
@@ -22,27 +64,31 @@ const changePasswordForm = reactive<{
   repassword: "",
 });
 
+
+// 处理菜单选择
+const handleSelect = (index: string) => {
+  router.push(index);
+  selectedMenuIndex.value = index;
+};
+
+
 // 确认修改密码
 async function submitChangePassword() {
   try {
     await changePassword(changePasswordForm);
     changePasswordFormVisible.value = false;
     ElMessage.success("修改成功，请重新登陆");
-
-    // 清除用户Token并跳转到登录页面
     setToken("");
     await router.push("/login");
   } catch (error) {
-    console.error("Failed to change password:", error);
     ElMessage.error("修改密码失败");
+    console.error("Failed to change password:", error);
   }
 }
 
 // 取消修改密码
 const cancelChangePassword = () => {
   changePasswordFormVisible.value = false;
-
-  // 重置表单数据
   Object.keys(changePasswordForm).forEach((key) => {
     (changePasswordForm as any)[key] = "";
   });
@@ -56,13 +102,56 @@ const changePasswordButton = () => {
   changePasswordFormVisible.value = true;
 };
 
-// 用户登出
+// 修改个人信息按钮
+const changeUserInfoButton =  () => {
+  userInfoForm.value = {
+    name: userInfo.name,
+    sex: userInfo.sex,
+    username: userInfo.username,
+    avatar: userInfo.avatar,
+    phone: userInfo.phone,
+    email: userInfo.email,
+  };
+  userInfoDialogVisible.value = true;
+};
+
+
+// 提交修改个人信息
+async function submitUserInfo() {
+  try {
+    // 提交个人信息更新
+    await changeUserInfo(userInfoForm.value);
+    Object.assign(userInfo, {
+      sex: userInfoForm.value.sex,
+      username: userInfoForm.value.username,
+      avatar: userInfoForm.value.avatar,
+      phone: userInfoForm.value.phone,
+      email: userInfoForm.value.email,
+    });
+    ElMessage.success("个人信息更新成功");
+    userInfoDialogVisible.value = false;
+  } catch (error) {
+    ElMessage.error("更新个人信息失败");
+    console.error("Failed to update personal info:", error);
+  }
+}
+
+// 取消修改个人信息
+const cancelPersonalInfo = () => {
+  userInfoDialogVisible.value = false;
+};
+
+// 登出
 const logOut = () => {
   setToken("");
   router.push("/login");
 };
-</script>
 
+// 页面加载时导航到当前选中菜单
+onMounted(() => {
+  router.push(selectedMenuIndex.value);
+});
+</script>
 <template>
   <el-dialog v-model="changePasswordFormVisible" title="修改密码" width="500px">
     <el-form
@@ -105,6 +194,51 @@ const logOut = () => {
       </div>
     </template>
   </el-dialog>
+
+  <el-dialog v-model="userInfoDialogVisible" title="个人信息" width="500px">
+    <el-form :model="userInfoForm" label-width="100px" size="large">
+      <el-form-item label="头像：" prop="avatar">
+        <el-upload
+          v-model="userInfoForm.avatar"
+          :action="avatarUploadConfig.action"
+          :show-file-list="avatarUploadConfig.showFileList"
+          :on-success="avatarUploadConfig.onSuccess"
+          :on-error="avatarUploadConfig.onError"
+          :headers="avatarUploadConfig.headers"
+        >
+          <el-avatar :src="userInfoForm.avatar" size="large"></el-avatar>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="姓名：" prop="name">
+        <el-input v-model="userInfoForm.name" placeholder="请输入姓名"></el-input>
+      </el-form-item>
+      <el-form-item label="性别：" prop="sex">
+        <el-select
+          v-model="userInfoForm.sex"
+          placeholder="请选择性别"
+        >
+          <el-option :value="1" label="男" />
+          <el-option :value="0" label="女" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="用户名：" prop="username">
+        <el-input v-model="userInfoForm.username" placeholder="请输入用户名"></el-input>
+      </el-form-item>
+      <el-form-item label="手机号：" prop="phone">
+        <el-input v-model="userInfoForm.phone" placeholder="请输入手机号"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱：" prop="email">
+        <el-input v-model="userInfoForm.email" placeholder="请输入邮箱"></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelPersonalInfo">取消</el-button>
+        <el-button type="primary" @click="submitUserInfo">提交</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
   <el-container class="el-container">
     <el-header
       class="... m-0 flex items-center bg-gradient-to-r from-slate-100 to-cyan-200 p-0"
@@ -116,10 +250,11 @@ const logOut = () => {
       </div>
       <el-dropdown class="ml-auto mr-4" placement="bottom">
         <el-avatar
-          src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+          :src=userInfo.avatar
         />
         <template #dropdown>
           <el-dropdown-menu>
+            <el-dropdown-item @click="changeUserInfoButton">个人信息</el-dropdown-item>
             <el-dropdown-item @click="changePasswordButton"
               >修改密码
             </el-dropdown-item>
@@ -129,7 +264,46 @@ const logOut = () => {
       </el-dropdown>
     </el-header>
     <el-container>
-      <el-main class="el-main m-5">
+      <el-aside class="el-aside">
+        <el-menu
+          background-color="#e0e5df"
+          class="bw-0"
+          default-active="/student/myReservation"
+          @select="handleSelect"
+        >
+          <el-menu-item index="/student/seatReservation">
+            <el-icon>
+              <School />
+            </el-icon>
+            <span>座位预约</span>
+          </el-menu-item>
+          <el-menu-item index="/student/myReservation">
+            <el-icon>
+              <View />
+            </el-icon>
+            <span>我的预约</span>
+          </el-menu-item>
+          <el-menu-item index="/student/bookBorrow">
+            <el-icon>
+              <Reading />
+            </el-icon>
+            <span>图书借阅</span>
+          </el-menu-item>
+          <el-menu-item index="/student/bookReview">
+            <el-icon>
+              <EditPen />
+            </el-icon>
+            <span>书评撰写</span>
+          </el-menu-item>
+          <el-menu-item index="/student/chatRoom">
+            <el-icon>
+              <ChatLineRound />
+            </el-icon>
+            <span>联系客服</span>
+          </el-menu-item>
+        </el-menu>
+      </el-aside>
+      <el-main class="el-main">
         <routerView></routerView>
       </el-main>
     </el-container>
@@ -145,5 +319,11 @@ const logOut = () => {
 .el-main {
   padding: 0;
   background-color: rgb(240, 242, 245);
+}
+
+.el-aside {
+  width: 200px;
+  text-align: center;
+  background-color: #e0e5df;
 }
 </style>

@@ -4,10 +4,10 @@ import router from "@/router/index.ts";
 import {
   CollectionTag,
   DataLine,
-  Document,
+  Document, Files,
   Notebook,
   Reading,
-  School,
+  School
 } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { changePassword } from "@/api/user.ts";
@@ -191,6 +191,12 @@ onMounted(() => {
               借阅量统计
             </el-menu-item>
           </el-sub-menu>
+          <el-menu-item index="/admin/articleCategory">
+            <el-icon>
+              <Files />
+            </el-icon>
+            <span>书评类型</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-main class="el-main">

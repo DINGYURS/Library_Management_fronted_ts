@@ -108,7 +108,13 @@ onMounted(async () => {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="剩余数量" prop="remainNumber" />
+        <el-table-column align="center" label="剩余数量" prop="remainNumber">
+          <template #default="{ row }">
+            <el-tag v-if="row.remainNumber === 0" type="danger"
+              >{{ row.remainNumber }}
+            </el-tag>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <el-pagination

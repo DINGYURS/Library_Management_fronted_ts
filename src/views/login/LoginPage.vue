@@ -100,8 +100,7 @@ const login = async () => {
 
     // 假设后端返回 { token, role, userId }
     userStore.setToken(res.data.token);
-    userStore.setRole(res.data.role);
-    userStore.setUserId(res.data.userId);
+    userStore.setUserInfo(res.data);
 
     ElMessage.success("登录成功");
 

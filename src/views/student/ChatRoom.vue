@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useUserStore } from "@/stores/user.ts";
 
-const userId = useUserStore().userId;
+const userId = useUserStore().userInfo.userId;
 let socket: WebSocket | null = null;
 
 // 定义输入的消息和消息列表
@@ -95,7 +95,7 @@ onBeforeUnmount(() => {
               'font-bold': msg.sender !== userId,
             }"
           >
-            {{ msg.sender === userId ? "我" : msg.sender }}：
+            {{ msg.sender === userId ? "我" : msg.sender }}
           </span>
           <span>{{ msg.content }}</span>
         </div>

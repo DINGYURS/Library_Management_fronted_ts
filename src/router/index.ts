@@ -21,12 +21,8 @@ const router = createRouter({
           redirect: '/admin/bookDisplay' // 默认重定向到显示页面
         },
         {
-          path: 'bookDisplay', // 自动继承父路径 /admin/
+          path: 'bookDisplay',
           component: () => import('@/views/admin/BookDisplay.vue')
-        },
-        {
-          path: 'personDisplay',
-          component: () => import('@/views/admin/PersonDisplay.vue')
         },
         {
           path: 'book',
@@ -44,6 +40,10 @@ const router = createRouter({
           path: 'borrowStatistic',
           component: () => import('@/views/admin/BorrowStatistic.vue')
         },
+        {
+          path: 'articleCategory',
+          component: () => import('@/views/admin/ArticleCategory.vue')
+        },
       ]
     },
     {
@@ -52,7 +52,15 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '/student/chatRoom' // 默认重定向到显示页面
+          redirect: '/student/myReservation' // 默认重定向到显示页面
+        },
+        {
+          path: 'seatReservation', // 自动继承父路径 /admin/
+          component: () => import('@/views/student/SeatReservation.vue')
+        },
+        {
+          path: 'myReservation',
+          component: () => import('@/views/student/MyReservation.vue')
         },
         {
           path: 'bookBorrow',
@@ -61,6 +69,10 @@ const router = createRouter({
         {
           path: 'chatRoom',
           component: () => import('@/views/student/ChatRoom.vue')
+        },
+        {
+          path: 'bookReview',
+          component: () => import('@/views/student/BookReview.vue')
         }
       ]
     },
@@ -79,8 +91,8 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const token = userStore.token
-  const role = userStore.role // 获取存储的角色信息 (整数)
-  const userId = userStore.userId // 获取存储的用户id信息
+  const role = userStore.userInfo.role // 获取存储的角色信息 (整数)
+  const userId = userStore.userInfo.userId // 获取存储的用户id信息
 
   console.log('Token:', token, 'Role:', role, 'Path:', to.path, 'UserId:', userId)
 
@@ -101,7 +113,7 @@ router.beforeEach((to, from, next) => {
       if (role === 0) {
         next('/admin/bookDisplay')
       } else if (role === 1) {
-        next('/student/chatRoom')
+        next('/student/myReservation')
       } else {
         // 处理异常情况，比如角色为空或未定义
         next('/login')

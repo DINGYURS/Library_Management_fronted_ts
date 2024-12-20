@@ -1,5 +1,5 @@
 import request from "@/utils/request.ts";
-import { FormModel } from "@/types/loginTypes.ts";
+import { FormModel, userInfoForm } from "@/types/loginTypes.ts";
 
 // 用户注册
 export const userRegisterService = (registerData: FormModel) => {
@@ -21,3 +21,8 @@ export const changePassword = (changePasswordForm: {
 }) => {
   return request.put("/api/changePassword", changePasswordForm);
 };
+
+export const changeUserInfo = (userInfoForm: userInfoForm) => {
+  return request.put("/api/changeUserInfo", userInfoForm);
+};
+

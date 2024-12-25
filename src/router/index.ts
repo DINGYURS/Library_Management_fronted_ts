@@ -14,7 +14,7 @@ const router = createRouter({
     },
     {
       path: '/admin',
-      component: () => import('@/views/admin/LayOut.vue'),
+      component: () => import('@/views/layout/LayOut.vue'),
       children: [
         {
           path: '',
@@ -44,15 +44,19 @@ const router = createRouter({
           path: 'articleCategory',
           component: () => import('@/views/admin/ArticleCategory.vue')
         },
+        {
+          path: 'noticeIssue',
+          component: () => import('@/views/admin/NoticeIssue.vue')
+        }
       ]
     },
     {
       path: '/student',
-      component: () => import('@/views/student/LayOut.vue'),
+      component: () => import('@/views/layout/LayOut.vue'),
       children: [
         {
           path: '',
-          redirect: '/student/myReservation' // 默认重定向到显示页面
+          redirect: '/student/seatReservation' // 默认重定向到显示页面
         },
         {
           path: 'seatReservation', // 自动继承父路径 /admin/
@@ -67,12 +71,8 @@ const router = createRouter({
           component: () => import('@/views/student/BookBorrow.vue')
         },
         {
-          path: 'chatRoom',
-          component: () => import('@/views/student/ChatRoom.vue')
-        },
-        {
-          path: 'bookReview',
-          component: () => import('@/views/student/BookReview.vue')
+          path: 'articleReview',
+          component: () => import('@/views/student/ArticleReview.vue')
         }
       ]
     },
@@ -92,9 +92,9 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const token = userStore.token
   const role = userStore.userInfo.role // 获取存储的角色信息 (整数)
-  const userId = userStore.userInfo.userId // 获取存储的用户id信息
+  // const userId = userStore.userInfo.userId // 获取存储的用户id信息
 
-  console.log('Token:', token, 'Role:', role, 'Path:', to.path, 'UserId:', userId)
+  // console.log('Token:', token, 'Role:', role, 'Path:', to.path, 'UserId:', userId)
 
   // TODO: 有没有一种方法可以通过登录学生账号拿到token，然后伪造role为0，从而直接绕过管理员登录，直接访问管理员才能看到的界面
   if (!token && to.path !== '/login') {
@@ -113,7 +113,7 @@ router.beforeEach((to, from, next) => {
       if (role === 0) {
         next('/admin/bookDisplay')
       } else if (role === 1) {
-        next('/student/myReservation')
+        next('/student/seatReservation')
       } else {
         // 处理异常情况，比如角色为空或未定义
         next('/login')

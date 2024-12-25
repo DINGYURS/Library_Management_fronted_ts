@@ -1,7 +1,14 @@
 <script lang="ts" setup>
-import { Lock, Male, Tickets, User } from "@element-plus/icons-vue";
-import { userLoginService, userRegisterService } from "@/api/user.ts";
-import { ref, watch } from "vue";
+import {
+  Cellphone,
+  ChatLineRound,
+  Lock,
+  Male,
+  Tickets,
+  User,
+} from "@element-plus/icons-vue";
+import { getCaptcha, userLoginService, userRegisterService } from "@/api/user.ts";
+import { onMounted, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user.ts";
 import { useRouter } from "vue-router";
@@ -9,14 +16,21 @@ import { FormModel } from "@/types/loginTypes.ts";
 
 const isRegister = ref(false);
 const form = ref();
+const userStore = useUserStore();
+const router = useRouter();
+const captchaSrc = ref<string>("");
+const captchaId = ref<string>("");
+const captchaCode = ref<string>("");
+const loading = ref(true)
 
 // 定义表单模型
 const formModel = ref<FormModel>({
   name: "",
   sex: null,
   username: "",
+  phone: "",
+  email: "",
   password: "",
-  repassword: "",
   checkCode: "",
   isOpenAdmin: false,
   className: "",
@@ -36,24 +50,6 @@ const rules = ref({
       trigger: "blur",
     },
   ],
-  repassword: [
-    { required: true, message: "请输入密码", trigger: "blur" },
-    {
-      pattern: /^\S{6,15}$/,
-      message: "只能是非空字符，长度在 6 到 15 个字符",
-      trigger: "blur",
-    },
-    {
-      validator: (rule: any, value: string, callback: Function) => {
-        if (value !== formModel.value.password) {
-          callback(new Error("两次输入密码不一致"));
-        } else {
-          callback();
-        }
-      },
-      trigger: "blur",
-    },
-  ],
 });
 
 // 注册函数
@@ -67,26 +63,19 @@ const register = async () => {
       name: formModel.value.name,
       sex: formModel.value.sex!,
       username: formModel.value.username,
+      phone: formModel.value.phone,
+      email: formModel.value.email,
       password: formModel.value.password,
       checkCode: formModel.value.checkCode,
       className: formModel.value.className,
     };
-    const res = await userRegisterService(registerData);
-
-    // 显示成功消息并跳转
-    if (res.data.code === 1) {
-      ElMessage.success("注册成功");
-      isRegister.value = false;
-    } else {
-      ElMessage.error(res.data.msg);
-    }
+    await userRegisterService(registerData);
+    ElMessage.success("注册成功");
+    isRegister.value = false;
   } catch (error) {
     ElMessage.error("注册失败");
   }
 };
-
-const userStore = useUserStore();
-const router = useRouter();
 
 // 登录函数
 const login = async () => {
@@ -96,9 +85,10 @@ const login = async () => {
     const res = await userLoginService(
       formModel.value.username,
       formModel.value.password,
+      captchaCode.value,
+      captchaId.value,
     );
 
-    // 假设后端返回 { token, role, userId }
     userStore.setToken(res.data.token);
     userStore.setUserInfo(res.data);
 
@@ -107,10 +97,22 @@ const login = async () => {
     if (res.data.role === 0) {
       await router.push("/admin/bookDisplay");
     } else if (res.data.role === 1) {
-      await router.push("/student/bookBorrow");
+      await router.push("/student/seatReservation");
     }
   } catch (error) {
-    ElMessage.error("登录失败");
+    await refreshCaptcha();
+    console.error("登录失败");
+  }
+};
+
+// 刷新验证码
+const refreshCaptcha = async () => {
+  try {
+    const response = await getCaptcha();
+    captchaSrc.value = response.data.captchaSrc;
+    captchaId.value = response.data.captchaId;
+  } catch (error) {
+    console.log(' Refresh Captcha Error', error);
   }
 };
 
@@ -120,11 +122,17 @@ watch(isRegister, () => {
     name: "",
     sex: null,
     username: "",
+    phone: "",
+    email: "",
     password: "",
-    repassword: "",
     checkCode: "",
     className: "",
   };
+});
+
+onMounted(() => {
+  refreshCaptcha();
+  loading.value = false;
 });
 </script>
 
@@ -183,13 +191,18 @@ watch(isRegister, () => {
             type="password"
           ></el-input>
         </el-form-item>
-        <el-form-item prop="repassword">
+        <el-form-item prop="phone">
           <el-input
-            v-model="formModel.repassword"
-            :prefix-icon="Lock"
-            placeholder="请再次输入密码"
-            type="password"
-            @keyup.enter="register"
+            v-model="formModel.phone"
+            :prefix-icon="Cellphone"
+            placeholder="请输入手机号"
+          ></el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            v-model="formModel.email"
+            :prefix-icon="ChatLineRound"
+            placeholder="请输入邮箱"
           ></el-input>
         </el-form-item>
         <el-form-item label="是否为管理员" prop="isOpenAdmin">
@@ -253,6 +266,24 @@ watch(isRegister, () => {
             @keyup.enter="login"
           ></el-input>
         </el-form-item>
+        <el-form-item prop="captchaCode">
+          <div class="flex items-center space-x-2">
+            <img
+              :src="captchaSrc"
+              alt="Captcha"
+              class="cursor-pointer"
+              @click="refreshCaptcha"
+              v-loading="loading"
+            />
+            <el-input
+              v-model="captchaCode"
+              :prefix-icon="Lock"
+              placeholder="请输入验证码"
+              @keyup.enter="login"
+            ></el-input>
+
+          </div>
+        </el-form-item>
         <el-form-item>
           <el-button
             auto-insert-space
@@ -282,7 +313,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-image: url("@/assets/CX_20221112_082545.jpg");
+  background-image: url("@/assets/CX_20221112_090313.jpg");
   background-size: cover;
   background-position: center;
 }

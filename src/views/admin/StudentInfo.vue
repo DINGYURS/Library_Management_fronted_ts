@@ -20,6 +20,7 @@ const tableData = ref<StudentForm[]>([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
+const loading = ref(true)
 
 const addForm = reactive<StudentForm>({
   name: "",
@@ -156,6 +157,7 @@ async function handleEchoData(row: StudentForm) {
 onMounted(async () => {
   try {
     await handleCurrentChange();
+    loading.value = false;
   } catch (error) {
     console.error("Failed to fetch Student data when created:", error);
   }
@@ -240,8 +242,9 @@ onMounted(async () => {
       </div>
     </template>
   </el-dialog>
-  <!-- 顶部表单 -->
-  <div class="rounded-lg p-5">
+
+  <div class="rounded-lg p-5" v-loading="loading">
+    <!-- 顶部表单 -->
     <div style="width: 100%">
       <el-form
         :inline="true"

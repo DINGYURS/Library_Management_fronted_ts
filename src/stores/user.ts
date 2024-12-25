@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { userInfo } from "@/types/loginTypes.ts";
+import { UserInfo } from "@/types/loginTypes.ts";
 
 export const useUserStore = defineStore('user', () => {
     const token = ref<string>('') // token 为 string 类型
-    const userInfo = ref<userInfo>({
+    const userInfo = ref<UserInfo>({
       avatar: "",
       email: "",
       name: "",
@@ -32,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
       }
     }
 
-    const setUserInfo = (newUserInfo: userInfo) => {
+    const setUserInfo = (newUserInfo: UserInfo) => {
       userInfo.value = newUserInfo
     }
 

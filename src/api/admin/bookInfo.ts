@@ -6,7 +6,7 @@ export const pageQueryBookInfo = (
   pageSize: number,
   queryForm: QueryForm,
 ) => {
-  return request.get("/api/admin/book/page", {
+  return request.get("/admin/book/page", {
     params: {
       page,
       pageSize,
@@ -19,15 +19,15 @@ export const pageQueryBookInfo = (
 
 // 新增书籍信息
 export const insertBookInfo = (addForm: BookForm) => {
-  return request.post("/api/admin/book", addForm);
+  return request.post("/admin/book", addForm);
 };
 
 // 修改书籍信息
 export const editBookInfo = (editForm: BookForm) => {
-  return request.put(`/api/admin/book`, editForm);
+  return request.put(`/admin/book`, editForm);
 };
 
 // 删除书籍信息
 export const deleteBookInfo = (ids: number[]) => {
-  return request.delete(`/api/admin/book/${ids}`);
+  return request.delete(`/admin/book/${ids}`);
 };

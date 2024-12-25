@@ -7,7 +7,7 @@ export const pageQueryBorrowDetail = (
   pageSize: number,
   queryForm: QueryForm,
 ) => {
-  return request.get("/api/admin/borrowDetail/page", {
+  return request.get("/admin/borrowDetail/page", {
     params: {
       page,
       pageSize,
@@ -20,15 +20,15 @@ export const pageQueryBorrowDetail = (
 
 // 新增借阅记录
 export const insertBorrowDetail = (addForm: BorrowDetail) => {
-  return request.post("/api/admin/borrowDetail", addForm);
+  return request.post("/admin/borrowDetail", addForm);
 };
 
 // 修改借阅记录
 export const editBorrowDetail = (editForm: BorrowDetail) => {
-  return request.put(`/api/admin/borrowDetail`, editForm);
+  return request.put(`/admin/borrowDetail`, editForm);
 };
 
 // 删除借阅记录
 export const deleteBorrowDetail = (ids: number[]) => {
-  return request.delete(`/api/admin/borrowDetail/${ids}`);
+  return request.delete(`/admin/borrowDetail/${ids}`);
 };

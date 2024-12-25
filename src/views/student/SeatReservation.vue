@@ -5,7 +5,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { ElMessage } from "element-plus";
 import { getSeatInfo, insertSeatReservation } from "@/api/student/seatReview";
-import { ReservationInfo } from "@/types/seatReservation";
+import { ReservationInfo } from "@/types/seatReservationTypes.ts";
 
 const svgChart = ref<HTMLElement | null>(null);
 const currentFloor = ref<number>(1);
@@ -15,12 +15,13 @@ const selectSeatNumber = ref<string>("");
 const selectDate = ref("");
 const selectTime = ref<string[]>([]);
 const reservationForm = ref<ReservationInfo>();
+const loading = ref(true)
 
 // SVG文件路径
 const svgPaths: { [key: number]: string } = {
-  1: "/src/assets/seat1.svg", // 第一层
-  2: "/src/assets/seat2.svg", // 第二层
-  3: "/src/assets/seat3.svg", // 第三层
+  1: "/assets/seat1.svg", // 第一层
+  2: "/assets/seat2.svg", // 第二层
+  3: "/assets/seat3.svg", // 第三层
 };
 
 // 禁用选择当前时间之前的日期
@@ -94,7 +95,7 @@ const submitReservation = async() => {
     selectDate.value = "";
     selectTime.value = [];
     takenSeatNames.value = [];
-    loadFloorMap(currentFloor.value);
+    await loadFloorMap(currentFloor.value);
 
   } catch (error) {
     console.error("预约失败:", error);
@@ -223,7 +224,6 @@ async function loadFloorMap(floor: number) {
 
 // 当选择的日期或时间变化时，调用API获取已占用的座位信息
 const handlePickerVisibleChange = async (visible: boolean) => {
-  console.log("visible", visible);
 
   if (!visible) {
     if (selectDate.value && selectTime.value.length === 2) {
@@ -232,7 +232,7 @@ const handlePickerVisibleChange = async (visible: boolean) => {
 
       try {
         const response = await getSeatInfo(startTime, endTime);
-        console.log("已占用座位信息：", response.data);
+        // console.log("已占用座位信息：", response.data);
 
         // 更新已占用的座位信息
         const seatNumbers = response.data.seatNumbers;
@@ -247,7 +247,7 @@ const handlePickerVisibleChange = async (visible: boolean) => {
         );
 
         // 重新加载楼层地图
-        loadFloorMap(currentFloor.value);
+        await loadFloorMap(currentFloor.value);
       } catch (error) {
         console.error("请求失败", error);
         ElMessage.error("请求失败，请稍后重试！");
@@ -257,12 +257,13 @@ const handlePickerVisibleChange = async (visible: boolean) => {
 };
 
 watch(currentFloor, async (newFloor) => {
-  loadFloorMap(newFloor);
+  await loadFloorMap(newFloor);
 });
 
 onMounted(() => {
   // 初始加载
   loadFloorMap(currentFloor.value);
+  loading.value = false;
 });
 
 onUnmounted(() => {
@@ -277,9 +278,9 @@ const selectFloor = (floor: number): void => {
 </script>
 
 <template>
-  <div class="h-full w-full bg-slate-100 p-5">
+  <div class="h-full w-full bg-slate-100 p-5" v-loading="loading">
     <div
-      class="flex h-full w-full flex-row overflow-hidden rounded-lg bg-blue-300"
+      class="flex h-full w-full flex-row rounded-lg"
     >
       <!-- 左侧区域：SVG 图表容器 -->
       <div class="h-full w-3/4 flex-1">
@@ -287,10 +288,10 @@ const selectFloor = (floor: number): void => {
       </div>
 
       <!-- 右侧区域：楼层、时间选择器 -->
-      <div class="flex h-full w-1/4 flex-col bg-yellow-400 p-4">
+      <div class="flex h-full w-1/4 flex-col bg-sky-200 p-4 rounded-lg shadow-2xl	">
         <!-- 楼层选择器 -->
         <div class="mb-4">
-          <div class="mb-2 text-lg font-bold text-white">选择楼层</div>
+          <div class="mb-2 text-lg font-bold text-zinc-800">选择楼层</div>
           <el-radio-group
             v-model="currentFloor"
             size="large"
@@ -306,7 +307,7 @@ const selectFloor = (floor: number): void => {
 
         <!-- 时间选择器 -->
         <div class="mb-4">
-          <div class="mb-2 text-lg font-bold text-white">选择预约时间</div>
+          <div class="mb-2 text-lg font-bold text-zinc-800">选择预约时间</div>
           <el-date-picker
             v-model="selectDate"
             type="date"

@@ -7,6 +7,7 @@ import {
   insertArticleCategory,
   pageQueryArticleCategory,
 } from "@/api/admin/article.ts";
+import { ArticleCategory } from "@/types/articleTypes.ts";
 
 const size = ref<"small" | "default" | "large">("default");
 const background = ref(true);
@@ -15,17 +16,18 @@ const hideOnSinglePage = ref(true);
 const labelPosition = ref<"left" | "right" | "top">("left");
 const insertFormVisible = ref(false);
 const editFormVisible = ref(false);
-const tableData = ref<[]>([]);
+const tableData = ref<ArticleCategory[]>([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
+const loading = ref(true)
 
-const addForm = reactive({
+const addForm = reactive<ArticleCategory>({
   categoryName: "",
 });
 
-const editForm = reactive({
-  categoryId: null,
+const editForm = reactive<ArticleCategory>({
+  categoryId: 0,
   categoryName: "",
 });
 
@@ -44,7 +46,7 @@ const addButton = () => {
   insertFormVisible.value = true;
 };
 
-// 新增学生信息
+// 新增分类信息
 async function submitInsert() {
   try {
     await insertArticleCategory(addForm);
@@ -62,7 +64,7 @@ const cancelInsert = () => {
 };
 
 // “删除”按钮
-const deleteButton = (row) => {
+const deleteButton = (row: ArticleCategory) => {
   ElMessageBox.confirm("确定删除该标签信息吗？", "警告", {
     confirmButtonText: "确认",
     cancelButtonText: "取消",
@@ -72,7 +74,7 @@ const deleteButton = (row) => {
   });
 };
 
-// 删除学生信息
+// 删除分类信息
 async function handleDeleteArticleCategory(categoryId: number) {
   try {
     await deleteArticleCategory(categoryId);
@@ -84,7 +86,7 @@ async function handleDeleteArticleCategory(categoryId: number) {
 }
 
 // “编辑”按钮
-const editButton = (row) => {
+const editButton = (row: ArticleCategory) => {
   editFormVisible.value = true;
   handleEchoData(row);
 };
@@ -94,7 +96,7 @@ const cancelEdit = () => {
   editFormVisible.value = false;
 };
 
-// 编辑学生信息
+// 编辑分类信息
 async function submitEdit() {
   try {
     await updateArticleCategory(editForm);
@@ -121,7 +123,7 @@ async function handleCurrentChange() {
 }
 
 // 回显数据
-async function handleEchoData(row) {
+async function handleEchoData(row: ArticleCategory) {
   try {
     editForm.categoryId = row.categoryId!;
     editForm.categoryName = row.categoryName;
@@ -134,6 +136,7 @@ async function handleEchoData(row) {
 onMounted(async () => {
   try {
     await handleCurrentChange();
+    loading.value = false;
   } catch (error) {
     console.error("Failed to fetch Student data when created:", error);
   }
@@ -193,7 +196,7 @@ onMounted(async () => {
     </template>
   </el-dialog>
   <!-- 顶部表单 -->
-  <div class="rounded-lg p-5">
+  <div class="rounded-lg p-5" v-loading="loading">
     <div style="width: 100%">
       <el-form
         :inline="true"

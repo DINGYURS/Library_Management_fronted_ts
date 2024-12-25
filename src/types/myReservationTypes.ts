@@ -1,5 +1,5 @@
 // 学生信息表单类型
-export type myReservationForm = {
+export type MyReservationForm = {
   reservationId: number;
   floor: number;
   seatNumber: string;
@@ -9,7 +9,7 @@ export type myReservationForm = {
   status: number;
 };
 
-export type statusChangeForm = {
+export type StatusChangeForm = {
   reservationId: number;
   status: number;
 }

@@ -3,14 +3,15 @@ export interface FormModel {
   name: string;
   sex: number | null;
   username: string;
+  phone: string;
+  email: string;
   password: string;
-  repassword?: string;
   checkCode: string;
   isOpenAdmin?: boolean;
   className: string;
 }
 
-export interface userInfo {
+export interface UserInfo {
   name: string;
   sex: number;
   username: string;
@@ -21,7 +22,7 @@ export interface userInfo {
   userId: number;
 }
 
-export interface userInfoForm{
+export interface UserInfoForm{
   name: string,
   sex: number,
   username: string,

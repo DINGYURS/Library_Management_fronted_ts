@@ -24,7 +24,7 @@ const labelPosition = ref<"left" | "right" | "top">("left");
 
 // 头像上传配置
 const avatarUploadConfig = {
-  action: "/api/common/upload", // 假设头像上传接口
+  action: "/api/common/upload",
   showFileList: false,
   headers:{'token': token},
   onSuccess(response: any) {
@@ -268,7 +268,7 @@ onMounted(() => {
         <el-menu
           background-color="#e0e5df"
           class="bw-0"
-          default-active="/student/myReservation"
+          default-active="/student/seatReservation"
           @select="handleSelect"
         >
           <el-menu-item index="/student/seatReservation">
@@ -289,7 +289,7 @@ onMounted(() => {
             </el-icon>
             <span>图书借阅</span>
           </el-menu-item>
-          <el-menu-item index="/student/bookReview">
+          <el-menu-item index="/student/articleReview">
             <el-icon>
               <EditPen />
             </el-icon>

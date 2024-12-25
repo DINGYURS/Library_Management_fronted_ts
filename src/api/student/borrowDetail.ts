@@ -7,7 +7,7 @@ export const pageQueryBorrowDetailIndividual = (
   pageSize: number,
   queryForm: QueryForm,
 ) => {
-  return request.get("/api/student/borrowDetail/page", {
+  return request.get("/student/borrowDetail/page", {
     params: {
       page,
       pageSize,

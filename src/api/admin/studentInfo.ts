@@ -7,7 +7,7 @@ export const pageQueryStudentInfo = (
   pageSize: number,
   queryForm: QueryForm,
 ) => {
-  return request.get("/api/admin/student/page", {
+  return request.get("/admin/student/page", {
     params: {
       page,
       pageSize,
@@ -20,15 +20,15 @@ export const pageQueryStudentInfo = (
 // 新增学生信息
 export const insertStudentInfo = (addForm: StudentForm) => {
   console.log("addForm", addForm);
-  return request.post("/api/admin/student", addForm);
+  return request.post("/admin/student", addForm);
 };
 
 // 修改学生信息
 export const editStudentInfo = (editForm: StudentForm) => {
-  return request.put("/api/admin/student", editForm);
+  return request.put("/admin/student", editForm);
 };
 
 // 删除学生信息
 export const deleteStudentInfo = (userId: number) => {
-  return request.delete(`/api/admin/student/${userId}`);
+  return request.delete(`/admin/student/${userId}`);
 };

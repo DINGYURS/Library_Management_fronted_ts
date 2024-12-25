@@ -7,7 +7,7 @@ export const pageQueryBorrowStatistic = (
   pageSize: number,
   queryForm: QueryForm,
 ) => {
-  return request.get("/api/admin/borrowStatistic/page", {
+  return request.get("/admin/borrowStatistic/page", {
     params: {
       page,
       pageSize,

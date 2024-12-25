@@ -37,7 +37,7 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 const switchValue = ref(false); // 控制查询类型的开关
-
+const loading = ref(true)
 const queryForm = reactive({
   bookName: "",
   author: "",
@@ -93,7 +93,6 @@ async function handleBookReturn(recordId: number) {
     ElMessage.success("还书成功");
   } catch (error) {
     console.error("Failed to return book:", error);
-    ElMessage.error("还书失败");
   }
 }
 
@@ -110,31 +109,32 @@ async function handleCurrentChange() {
 
     tableData.value = response.data.records;
     total.value = response.data.total;
-    ElMessage.success("查询成功");
+    // ElMessage.success("查询成功");
   } catch (error) {
     console.error("Failed to fetch data:", error);
-    ElMessage.error("查询失败");
   }
 }
-
-// 页面加载时获取数据
-onMounted(async () => {
-  try {
-    await handleCurrentChange();
-  } catch (error) {
-    console.error("Failed to fetch data on mounted:", error);
-  }
-});
 
 // 监听 switchValue 的变化，重新查询数据
 watch(switchValue, async () => {
   tableData.value = [];
   await handleCurrentChange();
 });
+
+// 页面加载时获取数据
+onMounted(async () => {
+  try {
+    await handleCurrentChange();
+    loading.value = false;
+  } catch (error) {
+    console.error("Failed to fetch data on mounted:", error);
+  }
+});
+
 </script>
 
 <template>
-  <div class="w-full p-5">
+  <div class="w-full p-5" v-loading="loading">
     <!-- 顶部表单 -->
     <div>
       <el-form

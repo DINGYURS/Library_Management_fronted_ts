@@ -21,6 +21,7 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 const ids = ref<number[]>([]);
+const loading = ref(true)
 
 const addForm = reactive<BookForm>({
   bookName: "",
@@ -178,6 +179,7 @@ async function handleEchoData(row: BookForm) {
 onMounted(async () => {
   try {
     await handleCurrentChange();
+    loading.value = false;
   } catch (error) {
     console.error("Failed to fetch book data when created:", error);
   }
@@ -273,7 +275,7 @@ onMounted(async () => {
       </div>
     </template>
   </el-dialog>
-  <div class="rounded-lg p-5">
+  <div class="rounded-lg p-5" v-loading="loading">
     <!-- 顶部表单 -->
     <div class="w-full">
       <el-form

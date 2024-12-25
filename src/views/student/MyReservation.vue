@@ -1,27 +1,22 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { ElMessage,  } from "element-plus";
-import { QueryForm } from "@/types/studentTypes.ts";
 import { changeSeatStatus, pageQueryMySeatReservation } from "@/api/student/myReservation";
-import { myReservationForm, statusChangeForm } from "@/types/myReservation";
+import { type MyReservationForm, type StatusChangeForm} from "@/types/myReservationTypes.ts";
 
 const size = ref<"small" | "default" | "large">("default");
 const background = ref(true);
 const disabled = ref(false);
 const hideOnSinglePage = ref(true);
-const tableData = ref<myReservationForm[]>([]);
+const tableData = ref<MyReservationForm[]>([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
-const statusChangeForm = ref<statusChangeForm>({
+const StatusChangeForm = ref<StatusChangeForm>({
   reservationId: 0,
   status: 0,
 });
-
-const queryForm = reactive<QueryForm>({
-  name: "",
-  username: "",
-});
+const loading = ref(true)
 
 // 计算表格序号
 const adjustedIndex = computed(() => {
@@ -31,11 +26,11 @@ const adjustedIndex = computed(() => {
 });
 
 // “签到”按钮
-const signInButton = async (row: myReservationForm) => {
+const signInButton = async (row: MyReservationForm) => {
   try {
-    statusChangeForm.value.reservationId = row.reservationId;
-    statusChangeForm.value.status = 1;
-    await changeSeatStatus(statusChangeForm.value);
+    StatusChangeForm.value.reservationId = row.reservationId;
+    StatusChangeForm.value.status = 1;
+    await changeSeatStatus(StatusChangeForm.value);
     ElMessage.success("签到成功");
     await handleCurrentChange();
   } catch (error) {
@@ -44,11 +39,11 @@ const signInButton = async (row: myReservationForm) => {
 };
 
 // “删除”按钮
-const signOutButton = async (row: myReservationForm) => {
+const signOutButton = async (row: MyReservationForm) => {
   try {
-    statusChangeForm.value.reservationId = row.reservationId;
-    statusChangeForm.value.status = 2;
-    await changeSeatStatus(statusChangeForm.value);
+    StatusChangeForm.value.reservationId = row.reservationId;
+    StatusChangeForm.value.status = 2;
+    await changeSeatStatus(StatusChangeForm.value);
     ElMessage.success("签退成功");
     await handleCurrentChange();
   } catch (error) {
@@ -75,47 +70,14 @@ async function handleCurrentChange() {
 onMounted(async () => {
   try {
     await handleCurrentChange();
+    loading.value = false;
   } catch (error) {
     console.error("Failed to fetch Student data when created:", error);
   }
 });
 </script>
 <template>
-  <!-- 顶部表单 -->
-  <div class="rounded-lg p-5">
-    <div style="width: 100%">
-      <el-form
-        :inline="true"
-        :model="queryForm"
-        class="mb-4 flex items-center justify-between rounded-lg bg-white font-bold"
-      >
-        <div class="flex space-x-4">
-          <el-form-item class="query-Form-item" label="条件查询">
-            <el-input
-              v-model="queryForm.name"
-              clearable
-              placeholder="按姓名查询"
-              @keyup.enter="handleCurrentChange"
-            />
-          </el-form-item>
-          <el-form-item class="query-Form-item">
-            <el-input
-              v-model="queryForm.username"
-              clearable
-              placeholder="按学号查询"
-              @keyup.enter="handleCurrentChange"
-            />
-          </el-form-item>
-        </div>
-        <div class="mr-4 flex space-x-4">
-          <el-form-item class="query-Form-item">
-            <el-button type="primary" @click="handleCurrentChange"
-              >查询
-            </el-button>
-          </el-form-item>
-        </div>
-      </el-form>
-    </div>
+  <div class="rounded-lg p-5" v-loading="loading">
     <!-- 表单数据展示 -->
     <div style="width: 100%">
       <el-table :data="tableData" border height="auto">
@@ -171,7 +133,4 @@ onMounted(async () => {
   </div>
 </template>
 <style scoped>
-.query-Form-item {
-  @apply mx-1.5 my-2.5;
-}
 </style>

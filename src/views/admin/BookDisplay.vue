@@ -3,9 +3,8 @@ import { computed, nextTick, onMounted, ref } from "vue";
 import dayjs from "dayjs";
 import useCharts from "@/composables/useCharts";
 import {
-  getClassBorrowVolume,
   getCreditScoreTop10,
-  getReadVolumeOfEachType,
+  getReadVolumeOfEachType, getTrafficVolume
 } from "@/api/admin/statistic.ts";
 import {
   ClassBorrowVolume,
@@ -16,6 +15,7 @@ import {
 const startDate = ref(dayjs().startOf("week").format("YYYY-MM-DD")); // 初始时间段开始日期
 const endDate = ref(dayjs().endOf("week").format("YYYY-MM-DD")); // 初始时间段结束日期
 const selectedButton = ref<"本周" | "近7天" | "近30天">("本周"); // 默认选中的按钮
+const loading = ref(true)
 
 // 定义选中和未选中按钮的样式
 const selectedStyle = {
@@ -72,12 +72,13 @@ function selectTimeRange(range: "本周" | "近7天" | "近30天") {
 
 const getStatisticInfo = async () => {
   try {
-    const response = await getClassBorrowVolume(startDate.value, endDate.value);
+    const response = await getTrafficVolume(startDate.value, endDate.value);
     const response2 = await getCreditScoreTop10();
     const response3 = await getReadVolumeOfEachType();
+    loading.value = false;
 
     classBorrowVolume.value.dateList = response.data.dateList;
-    classBorrowVolume.value.borrowVolume = response.data.borrowVolume;
+    classBorrowVolume.value.borrowVolume = response.data.trafficVolume;
 
     creditScoreTop10.value.nameList = response2.data.nameList;
     creditScoreTop10.value.creditScoreList = response2.data.creditScoreList;
@@ -96,9 +97,9 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="flex h-full w-full flex-col bg-slate-100 p-5">
+  <div class="flex h-full w-full flex-col p-5" v-loading="loading">
     <!-- 顶部时间选择区域 -->
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex">
       <div class="flex items-center">
         <el-button-group>
           <el-button
@@ -127,7 +128,6 @@ onMounted(() => {
           >已选时间：{{ dateRange }}</span
         >
       </div>
-      <div></div>
     </div>
     <!-- 可视化数据展示区域 -->
     <div class="flex h-full w-full flex-grow flex-col space-y-4">

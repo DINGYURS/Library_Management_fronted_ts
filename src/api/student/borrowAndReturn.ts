@@ -2,7 +2,7 @@ import request from "@/utils/request.ts";
 
 // 借书
 export const bookBorrow = (copyId: number) => {
-  return request.get("/api/student/bookBorrow", {
+  return request.get("/student/bookBorrow", {
     params: {
       copyId,
     },
@@ -10,7 +10,7 @@ export const bookBorrow = (copyId: number) => {
 };
 // 还书
 export const bookReturn = (recordId: number) => {
-  return request.get("/api/student/bookReturn", {
+  return request.get("/student/bookReturn", {
     params: {
       recordId,
     },

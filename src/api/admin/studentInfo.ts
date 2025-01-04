@@ -32,3 +32,13 @@ export const editStudentInfo = (editForm: StudentForm) => {
 export const deleteStudentInfo = (userId: number) => {
   return request.delete(`/admin/student/${userId}`);
 };
+
+// 获取当前登录用户
+export const getLoggedUsers = () => {
+  return request.get("/admin/student/loggedUsers");
+};
+
+// 强制用户下线
+export const forceOfflineStudent = (userId: number) => {
+  return request.post("/admin/student/forceLogout", { userId });
+};

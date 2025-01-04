@@ -22,7 +22,7 @@ export default function (
 
     line.setOption({
       title: {
-        text: "书籍借阅量变化",
+        text: "进馆人流量",
       },
       tooltip: {
         trigger: "axis",
@@ -43,7 +43,7 @@ export default function (
       },
       yAxis: {
         type: "value",
-        axisLabel: { formatter: "{value} 本" },
+        axisLabel: { formatter: "{value} 人" },
       },
       series: [
         {

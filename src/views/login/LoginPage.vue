@@ -21,7 +21,7 @@ const router = useRouter();
 const captchaSrc = ref<string>("");
 const captchaId = ref<string>("");
 const captchaCode = ref<string>("");
-const loading = ref(true)
+const loading = ref(true);
 
 // 定义表单模型
 const formModel = ref<FormModel>({
@@ -36,11 +36,19 @@ const formModel = ref<FormModel>({
   className: "",
 });
 
-// 表单验证规则
-const rules = ref({
+// 注册表单验证规则
+const registerRules = ref({
   username: [
     { required: true, message: "请输入用户名", trigger: "blur" },
-    { min: 3, max: 10, message: "长度在 3 到 10 个字符", trigger: "blur" },
+    { pattern: /^[a-zA-Z][a-zA-Z0-9]{2,9}$/, message: "必须以字母开头，长度在 3 到 10 个字符", trigger: "blur" },
+  ],
+  phone: [
+    { required: true, message: "请输入手机号", trigger: "blur" },
+    { pattern: /^1[3-9]\d{9}$/, message: "请输入正确手机号", trigger: "blur" },
+  ],
+  email: [
+    { required: true, message: "请输入邮箱地址", trigger: "blur" },
+    { pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/, message: "请输入正确的邮箱地址", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
@@ -51,6 +59,50 @@ const rules = ref({
     },
   ],
 });
+
+// 登录表单验证规则
+const loginRules = ref({
+  username: [
+    {
+      required: true,
+      message: "请输入用户名、手机号或邮箱",
+      trigger: "blur"
+    },
+    {
+      validator: (rule: any, value: any, callback: any) => {
+        if (!value) {
+          callback(new Error("请输入用户名、手机号或邮箱"));
+          return;
+        }
+
+        // 验证用户名
+        const usernamePattern = /^[a-zA-Z][a-zA-Z0-9]{2,12}$/;
+        const phonePattern = /^1[3-9]\d{9}$/;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        if (usernamePattern.test(value)) {
+          callback();
+        } else if (phonePattern.test(value)) {
+          callback();
+        } else if (emailPattern.test(value)) {
+          callback();
+        } else {
+          callback(new Error("请输入有效的用户名、手机号或邮箱"));
+        }
+      },
+      trigger: "blur"
+    }
+  ],
+  password: [
+    { required: true, message: "请输入密码", trigger: "blur" },
+    {
+      pattern: /^\S{6,15}$/, // 密码：6-15个非空字符
+      message: "只能是非空字符，长度在 6 到 15 个字符",
+      trigger: "blur",
+    },
+  ],
+});
+
 
 // 注册函数
 const register = async () => {
@@ -86,7 +138,7 @@ const login = async () => {
       formModel.value.username,
       formModel.value.password,
       captchaCode.value,
-      captchaId.value,
+      captchaId.value
     );
 
     userStore.setToken(res.data.token);
@@ -112,7 +164,7 @@ const refreshCaptcha = async () => {
     captchaSrc.value = response.data.captchaSrc;
     captchaId.value = response.data.captchaId;
   } catch (error) {
-    console.log(' Refresh Captcha Error', error);
+    console.log("Refresh Captcha Error", error);
   }
 };
 
@@ -139,13 +191,13 @@ onMounted(() => {
 <template>
   <el-row class="login-page">
     <el-col :span="6" class="form">
-      <h1 class="font-sans text-4xl font-black">图书管理系统</h1>
+      <h1 class="font-sans text-4xl font-black">图书馆管理系统</h1>
       <!-- 注册表单 -->
       <el-form
         v-if="isRegister"
         ref="form"
         :model="formModel"
-        :rules="rules"
+        :rules="registerRules"
         autocomplete="off"
         size="large"
       >
@@ -198,7 +250,7 @@ onMounted(() => {
             placeholder="请输入手机号"
           ></el-input>
         </el-form-item>
-        <el-form-item prop="password">
+        <el-form-item prop="email">
           <el-input
             v-model="formModel.email"
             :prefix-icon="ChatLineRound"
@@ -242,7 +294,7 @@ onMounted(() => {
         v-else
         ref="form"
         :model="formModel"
-        :rules="rules"
+        :rules="loginRules"
         autocomplete="off"
         size="large"
       >
@@ -281,7 +333,6 @@ onMounted(() => {
               placeholder="请输入验证码"
               @keyup.enter="login"
             ></el-input>
-
           </div>
         </el-form-item>
         <el-form-item>
@@ -313,7 +364,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-image: url("@/assets/CX_20221112_090313.jpg");
+  background-image: url("@/assets/CX_20221112_082545.jpg");
   background-size: cover;
   background-position: center;
 }

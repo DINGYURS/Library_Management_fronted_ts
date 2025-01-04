@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import { pageQueryBorrowStatistic } from "@/api/admin/borrowStatistic.ts";
+import {
+  BorrowStatisticExport,
+  pageQueryBorrowStatistic,
+} from "@/api/admin/borrowStatistic.ts";
 import { BorrowStatistic, QueryForm } from "@/types/borrowStatisticTypes.ts"; // 引入类型
+import { Download, Search } from "@element-plus/icons-vue";
 
 const size = ref<"small" | "default" | "large">("default");
 const background = ref(true);
@@ -12,7 +16,7 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 const ids = ref<number[]>([]);
-const loading = ref(true)
+const loading = ref(true);
 
 const queryForm = reactive<QueryForm>({
   bookName: "",
@@ -45,6 +49,35 @@ async function handleCurrentChange() {
     console.error("Failed to fetch borrow statistics:", error);
   }
 }
+
+const exportData = async () => {
+  try {
+    const response = await BorrowStatisticExport();
+
+    // 判断响应是否成功并且响应数据是一个 Blob 文件
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    // 创建一个链接元素，用于触发下载
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "borrow_statistics.xlsx"; // 设置下载的文件名
+
+    // 将链接添加到 DOM（必要时）
+    document.body.appendChild(link);
+
+    // 模拟点击事件触发下载
+    link.click();
+
+    // 清理
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  } catch (error) {
+    // 错误处理
+    console.error("导出失败：", error);
+  }
+};
 
 // 页面加载时获取数据
 onMounted(async () => {
@@ -79,7 +112,11 @@ onMounted(async () => {
         <!-- 右侧按钮组 -->
         <div class="mr-4 flex space-x-4">
           <el-form-item class="query-Form-item">
-            <el-button type="primary" @click="handleCurrentChange"
+            <el-button :icon="Download" @click="exportData">导出数据</el-button>
+            <el-button
+              type="primary"
+              :icon="Search"
+              @click="handleCurrentChange"
               >查询
             </el-button>
           </el-form-item>

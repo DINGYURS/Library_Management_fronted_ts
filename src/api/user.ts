@@ -7,9 +7,9 @@ export const userRegisterService = (registerData: FormModel) => {
 };
 
 // 用户登录
-export const userLoginService = (username: string, password: string, captchaCode: string, captchaId: string) =>
+export const userLoginService = (loginKey: string, password: string, captchaCode: string, captchaId: string) =>
   request.post("/login", {
-    username,
+    loginKey,
     password,
     captchaCode,
     captchaId,

@@ -4,6 +4,8 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import {
   deleteStudentInfo,
   editStudentInfo,
+  forceOfflineStudent,
+  getLoggedUsers,
   insertStudentInfo,
   pageQueryStudentInfo,
 } from "@/api/admin/studentInfo.ts";
@@ -20,8 +22,8 @@ const tableData = ref<StudentForm[]>([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
-const loading = ref(true)
-
+const loading = ref(true);
+const loggedUserIds = ref<number[]>([]); // 用于存储已登录用户的 ID 列表
 const addForm = reactive<StudentForm>({
   name: "",
   sex: null,
@@ -126,6 +128,28 @@ async function handleDeleteStudentInfo(userId: number) {
   }
 }
 
+// “下线”按钮
+const offlineButton = (row: StudentForm) => {
+  ElMessageBox.confirm("确定下线该学生吗？", "警告", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    handleForceOffline(row.userId!);
+  });
+};
+
+// 下线学生账号
+async function handleForceOffline(userId: number) {
+  try {
+    await forceOfflineStudent(userId);
+    await handleGetLoggedUsers();
+    ElMessage.success("下线成功");
+  } catch (error) {
+    console.error("Failed to offline:", error);
+  }
+}
+
 // 分页查询数据
 async function handleCurrentChange() {
   try {
@@ -140,6 +164,15 @@ async function handleCurrentChange() {
     console.error("Failed to fetch Student data:", error);
   }
 }
+
+const handleGetLoggedUsers = async () => {
+  try {
+    const response = await getLoggedUsers();
+    loggedUserIds.value = response.data.map((user: any) => user.userId);
+  } catch (error) {
+    console.error("Failed to fetch logged users:", error);
+  }
+};
 
 // 回显数据
 async function handleEchoData(row: StudentForm) {
@@ -157,6 +190,7 @@ async function handleEchoData(row: StudentForm) {
 onMounted(async () => {
   try {
     await handleCurrentChange();
+    await handleGetLoggedUsers();
     loading.value = false;
   } catch (error) {
     console.error("Failed to fetch Student data when created:", error);
@@ -309,11 +343,34 @@ onMounted(async () => {
             {{ row.readVolume !== null ? row.readVolume : 0 }}
           </template>
         </el-table-column>
-        <el-table-column align="center" label="信用分" prop="creditScore" />
+        <!--        <el-table-column align="center" label="信用分" prop="creditScore" />-->
+        <el-table-column align="center" label="在线状态">
+          <template #default="{ row }">
+            <!-- 判断 row.userId 是否在 loggedUserIds 中 -->
+            <el-tag v-if="loggedUserIds.includes(row.userId!)" type="success"
+              >在线</el-tag
+            >
+            <el-tag v-else type="info">离线</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column align="center" fixed="right" label="操作">
           <template #default="{ row }">
-            <el-button type="primary" @click="editButton(row)">编辑</el-button>
-            <el-button type="danger" @click="deleteButton(row)">删除</el-button>
+            <div class="flex space-x-1">
+              <el-button type="primary" @click="editButton(row)"
+                >编辑</el-button
+              >
+              <el-button type="danger" @click="deleteButton(row)"
+                >删除</el-button
+              >
+              <el-button
+                type="danger"
+                plain
+                @click="offlineButton(row)"
+                :disabled="!loggedUserIds.includes(row.userId!)"
+              >
+                下线
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

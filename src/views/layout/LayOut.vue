@@ -18,7 +18,7 @@ import { changePassword, changeUserInfo } from "@/api/user.ts";
 import { useUserStore } from "@/stores/user.ts";
 
 const { setToken, token, userInfo } = useUserStore();
-const selectedMenuIndex = ref<string>("/admin/bookDisplay");
+const selectedMenuIndex = ref<string>(router.currentRoute.value.path);
 const changePasswordFormVisible = ref<boolean>(false);
 const userInfoDialogVisible = ref<boolean>(false);
 const isAdmin = ref<boolean>(false);
@@ -151,7 +151,7 @@ const logOut = () => {
 // 页面加载时导航到当前选中菜单
 onMounted(() => {
   isAdmin.value = userInfo.role === 1;
-  router.push(selectedMenuIndex.value);
+  handleSelect(selectedMenuIndex.value);
 });
 </script>
 <template>
@@ -280,7 +280,7 @@ onMounted(() => {
         <el-menu
           background-color="#e0e5df"
           class="bw-0"
-          default-active="/student/seatReservation"
+          :default-active="selectedMenuIndex"
           @select="handleSelect"
         >
           <el-menu-item index="/student/seatReservation">
@@ -315,7 +315,7 @@ onMounted(() => {
         <el-menu
           background-color="#e0e5df"
           class="bw-0"
-          default-active="/admin/bookDisplay"
+          :default-active="selectedMenuIndex"
           @select="handleSelect"
         >
           <el-menu-item index="/admin/bookDisplay">
@@ -370,10 +370,13 @@ onMounted(() => {
           </el-menu-item>
         </el-menu>
       </el-aside>
-        <el-main class="el-main bg-slate-100">
-          <routerView></routerView>
-        </el-main>
+      <el-main class="el-main bg-slate-100">
+        <routerView></routerView>
+      </el-main>
     </el-container>
+    <el-footer class="bg-sky-100" height="50px">
+      <div class="flex justify-center items-center h-full text-gray-800">© 2024-2025 陈曦. All Rights Reserved</div>
+    </el-footer>
   </el-container>
 </template>
 <style scoped>

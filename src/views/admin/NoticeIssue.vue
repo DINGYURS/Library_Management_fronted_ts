@@ -24,12 +24,9 @@ const disabled = ref(false);
 const hideOnSinglePage = ref(true);
 const quill = ref();
 const loading = ref(true)
-// drawer 显示与否
-const formVisible = ref(false);
-
+const formVisible = ref(false); // drawer 显示与否
 // 区分操作场景：create(新增) | edit(编辑) | review(审核) | view(查看)
 const drawerMode = ref<"create" | "edit" | "review" | "view">("create");
-
 // 表格相关
 const tableData = ref<ArticleInfo[]>([]);
 const currentPage = ref(1);

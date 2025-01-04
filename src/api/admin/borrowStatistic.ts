@@ -15,3 +15,9 @@ export const pageQueryBorrowStatistic = (
     },
   });
 };
+
+export const BorrowStatisticExport = () => {
+  return request.get("/admin/borrowStatistic/export", {
+    responseType: "blob"
+  });
+};

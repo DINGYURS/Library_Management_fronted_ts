@@ -99,7 +99,7 @@ onMounted(() => {
 <template>
   <div class="flex h-full w-full flex-col p-5" v-loading="loading">
     <!-- 顶部时间选择区域 -->
-    <div class="mb-4 flex">
+    <div class="mb-4 flex justify-between items-center">
       <div class="flex items-center">
         <el-button-group>
           <el-button
